@@ -1,4 +1,4 @@
-package cz.encircled.ioc.container;
+package cz.encircled.ioc.context;
 
 import cz.encircled.ioc.annotation.Order;
 import cz.encircled.ioc.core.context.AnnotationContext;
@@ -6,8 +6,8 @@ import cz.encircled.ioc.exception.ComponentNotFoundException;
 import cz.encircled.ioc.model.Building;
 import cz.encircled.ioc.model.House;
 import cz.encircled.ioc.model.Window;
-import cz.encircled.ioc.model.condition.FalseCondition;
-import cz.encircled.ioc.model.condition.TrueCondition;
+import cz.encircled.ioc.model.condition.FalseConditionComponent;
+import cz.encircled.ioc.model.condition.TrueConditionComponent;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,9 +67,16 @@ public class ContextCreationTest {
 
     @Test(expected = ComponentNotFoundException.class)
     public void conditionalTest() {
-        TrueCondition trueCondition = context.getComponent(TrueCondition.class);
+        TrueConditionComponent trueCondition = context.getComponent(TrueConditionComponent.class);
         Assert.assertNotNull(trueCondition);
-        context.getComponent(FalseCondition.class);
+        context.getComponent(FalseConditionComponent.class);
+    }
+
+    @Test(expected = ComponentNotFoundException.class)
+    public void conditionalByNameTest() {
+        TrueConditionComponent trueCondition = (TrueConditionComponent) context.getComponent("trueConditionComponent");
+        Assert.assertNotNull(trueCondition);
+        context.getComponent("falseConditionComponent");
     }
 
     @Test

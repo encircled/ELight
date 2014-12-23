@@ -10,5 +10,4 @@ import cz.encircled.ioc.annotation.Conditional;
 @Conditional(FalseCondition.class)
 public class FalseConditionComponent {
 
-
 }
