@@ -1,7 +1,9 @@
 package cz.encircled.ioc.core;
 
 import cz.encircled.ioc.annotation.Component;
+import cz.encircled.ioc.annotation.Conditional;
 import cz.encircled.ioc.exception.RuntimeELightException;
+import cz.encircled.ioc.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +26,6 @@ import java.util.regex.Pattern;
 /**
  * Created by encircled on 9/19/14.
  */
-// TODO clean
 public class ClasspathResourcesScanner {
 
     private static final Logger log = LogManager.getLogger();
@@ -109,7 +110,12 @@ public class ClasspathResourcesScanner {
     }
 
     private boolean checkCandidate(Class<?> clazz) {
-        return clazz.getAnnotation(Component.class) != null && !Modifier.isAbstract(clazz.getModifiers());
+        return clazz.getAnnotation(Component.class) != null && !Modifier.isAbstract(clazz.getModifiers()) && checkCondition(clazz);
+    }
+
+    private boolean checkCondition(Class<?> clazz) {
+        Conditional conditional = clazz.getAnnotation(Conditional.class);
+        return conditional == null || ReflectionUtil.instance(conditional.value()).addToContext(clazz);
     }
 
     private boolean isJar(String protocol) {

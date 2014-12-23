@@ -85,7 +85,7 @@ public class DefaultComponentFactory implements ComponentFactory {
                 return (T) singletonInstances.get(definition.name);
             }
         }
-        return null;
+        throw new ComponentNotFoundException(type);
     }
 
     @Override

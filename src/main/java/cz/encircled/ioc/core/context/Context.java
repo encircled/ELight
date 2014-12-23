@@ -12,6 +12,10 @@ public interface Context {
     @Nullable
     Object getComponent(String name);
 
+    boolean containsComponent(String name);
+
+    boolean containsComponent(Class<?> clazz);
+
     void addComponent(Object component);
 
 }

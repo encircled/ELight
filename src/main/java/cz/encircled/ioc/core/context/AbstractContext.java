@@ -3,6 +3,7 @@ package cz.encircled.ioc.core.context;
 import cz.encircled.ioc.core.definition.AnnotationDefinitionBuilder;
 import cz.encircled.ioc.core.definition.DefinitionBuilder;
 import cz.encircled.ioc.core.factory.ComponentFactory;
+import cz.encircled.ioc.exception.ComponentNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +31,26 @@ public abstract class AbstractContext implements Context {
     @Override
     public Object getComponent(String name) {
         return componentFactory.getComponent(name);
+    }
+
+    @Override
+    public boolean containsComponent(String name) {
+        try {
+            getComponent(name);
+            return true;
+        } catch (ComponentNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean containsComponent(Class<?> clazz) {
+        try {
+            getComponent(clazz);
+            return true;
+        } catch (ComponentNotFoundException e) {
+            return false;
+        }
     }
 
     /**
