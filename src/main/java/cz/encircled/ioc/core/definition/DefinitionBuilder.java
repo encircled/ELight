@@ -1,8 +1,8 @@
 package cz.encircled.ioc.core.definition;
 
-import cz.encircled.ioc.component.ComponentDefinition;
-import cz.encircled.ioc.component.DependencyDescription;
-import cz.encircled.ioc.component.creator.InstanceCreator;
+import cz.encircled.ioc.core.ComponentDefinition;
+import cz.encircled.ioc.core.DependencyDescription;
+import cz.encircled.ioc.core.creator.InstanceCreator;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;

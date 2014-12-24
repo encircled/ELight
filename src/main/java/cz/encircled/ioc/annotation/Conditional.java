@@ -1,6 +1,6 @@
 package cz.encircled.ioc.annotation;
 
-import cz.encircled.ioc.component.condition.ComponentCondition;
+import cz.encircled.ioc.core.ComponentCondition;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

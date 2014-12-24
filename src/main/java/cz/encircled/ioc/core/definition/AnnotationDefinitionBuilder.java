@@ -1,9 +1,9 @@
 package cz.encircled.ioc.core.definition;
 
 import cz.encircled.ioc.annotation.*;
-import cz.encircled.ioc.component.DependencyDescription;
-import cz.encircled.ioc.component.creator.InstanceCreator;
+import cz.encircled.ioc.core.DependencyDescription;
 import cz.encircled.ioc.core.context.ContextConstants;
+import cz.encircled.ioc.core.creator.InstanceCreator;
 import cz.encircled.ioc.util.ComponentUtil;
 import cz.encircled.ioc.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;

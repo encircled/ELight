@@ -1,6 +1,6 @@
 package cz.encircled.ioc.core.factory;
 
-import cz.encircled.ioc.component.ComponentDefinition;
+import cz.encircled.ioc.core.ComponentDefinition;
 import cz.encircled.ioc.core.ComponentPostProcessor;
 
 import java.util.List;

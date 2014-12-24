@@ -2,8 +2,8 @@ package cz.encircled.ioc.core.context;
 
 import cz.encircled.ioc.core.definition.AnnotationDefinitionBuilder;
 import cz.encircled.ioc.core.definition.DefinitionBuilder;
+import cz.encircled.ioc.core.exception.ComponentNotFoundException;
 import cz.encircled.ioc.core.factory.ComponentFactory;
-import cz.encircled.ioc.exception.ComponentNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

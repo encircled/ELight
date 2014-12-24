@@ -1,6 +1,6 @@
-package cz.encircled.ioc.component;
+package cz.encircled.ioc.core;
 
-import cz.encircled.ioc.component.creator.InstanceCreator;
+import cz.encircled.ioc.core.creator.InstanceCreator;
 
 import java.lang.reflect.Method;
 import java.util.List;

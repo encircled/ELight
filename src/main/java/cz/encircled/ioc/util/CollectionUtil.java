@@ -1,6 +1,6 @@
 package cz.encircled.ioc.util;
 
-import cz.encircled.ioc.exception.RuntimeELightException;
+import cz.encircled.ioc.core.exception.RuntimeELightException;
 
 import java.lang.reflect.Array;
 import java.util.*;

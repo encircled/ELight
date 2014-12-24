@@ -1,4 +1,4 @@
-package cz.encircled.ioc.component;
+package cz.encircled.ioc.core;
 
 import java.lang.reflect.Field;
 

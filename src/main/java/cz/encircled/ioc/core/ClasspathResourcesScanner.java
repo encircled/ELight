@@ -2,8 +2,8 @@ package cz.encircled.ioc.core;
 
 import cz.encircled.ioc.annotation.Component;
 import cz.encircled.ioc.annotation.Conditional;
+import cz.encircled.ioc.core.exception.RuntimeELightException;
 import cz.encircled.ioc.core.factory.ComponentFactory;
-import cz.encircled.ioc.exception.RuntimeELightException;
 import cz.encircled.ioc.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;

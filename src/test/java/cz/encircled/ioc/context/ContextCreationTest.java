@@ -2,7 +2,7 @@ package cz.encircled.ioc.context;
 
 import cz.encircled.ioc.annotation.Order;
 import cz.encircled.ioc.core.context.AnnotationContext;
-import cz.encircled.ioc.exception.ComponentNotFoundException;
+import cz.encircled.ioc.core.exception.ComponentNotFoundException;
 import cz.encircled.ioc.model.condition.FalseConditionComponent;
 import cz.encircled.ioc.model.condition.TrueConditionComponent;
 import cz.encircled.ioc.model.house.Building;

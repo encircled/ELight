@@ -1,4 +1,4 @@
-package cz.encircled.ioc.component.condition;
+package cz.encircled.ioc.core;
 
 /**
  * Created by Encircled on 22-Dec-14.

@@ -1,11 +1,11 @@
 package cz.encircled.ioc.core.factory;
 
-import cz.encircled.ioc.component.ComponentDefinition;
-import cz.encircled.ioc.component.DependencyDescription;
+import cz.encircled.ioc.core.ComponentDefinition;
 import cz.encircled.ioc.core.ComponentPostProcessor;
-import cz.encircled.ioc.exception.ComponentNotFoundException;
-import cz.encircled.ioc.exception.DuplicatedComponentException;
-import cz.encircled.ioc.exception.WiredMapGenericException;
+import cz.encircled.ioc.core.DependencyDescription;
+import cz.encircled.ioc.core.exception.ComponentNotFoundException;
+import cz.encircled.ioc.core.exception.DuplicatedComponentException;
+import cz.encircled.ioc.core.exception.WiredMapGenericException;
 import cz.encircled.ioc.util.CollectionUtil;
 import cz.encircled.ioc.util.ReflectionUtil;
 import org.apache.logging.log4j.LogManager;

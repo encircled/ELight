@@ -1,4 +1,4 @@
-package cz.encircled.ioc.component.creator;
+package cz.encircled.ioc.core.creator;
 
 /**
  * Created by Encircled on 16/09/2014.

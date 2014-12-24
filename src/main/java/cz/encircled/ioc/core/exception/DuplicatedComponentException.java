@@ -1,4 +1,4 @@
-package cz.encircled.ioc.exception;
+package cz.encircled.ioc.core.exception;
 
 /**
  * Created by Encircled on 24-Dec-14.

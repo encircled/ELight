@@ -1,4 +1,4 @@
-package cz.encircled.ioc.exception;
+package cz.encircled.ioc.core.exception;
 
 import cz.encircled.ioc.util.CollectionUtil;
 

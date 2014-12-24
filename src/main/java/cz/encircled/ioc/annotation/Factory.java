@@ -1,6 +1,6 @@
 package cz.encircled.ioc.annotation;
 
-import cz.encircled.ioc.component.creator.InstanceCreator;
+import cz.encircled.ioc.core.creator.InstanceCreator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

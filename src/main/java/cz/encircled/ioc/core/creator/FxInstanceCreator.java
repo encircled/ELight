@@ -1,4 +1,4 @@
-package cz.encircled.ioc.component.creator;
+package cz.encircled.ioc.core.creator;
 
 import cz.encircled.ioc.util.ReflectionUtil;
 import javafx.application.Platform;
