@@ -21,8 +21,8 @@ public class AnnotationContext extends AbstractContext implements Context {
         componentFactory = new DefaultComponentFactory();
         definitionBuilder = new AnnotationDefinitionBuilder();
 
-        List<Class<?>> componentClasses = new ClasspathResourcesScanner().findComponentClasses(rootPackage);
-        componentClasses.stream().forEach(c -> {
+        List<Class<?>> componentClasses = new ClasspathResourcesScanner(componentFactory).findComponentClasses(rootPackage);
+        componentClasses.parallelStream().forEach(c -> {
             componentFactory.registerDefinition(definitionBuilder.buildDefinition(c));
         });
         startContext();

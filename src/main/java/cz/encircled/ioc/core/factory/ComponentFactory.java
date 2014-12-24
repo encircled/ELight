@@ -1,6 +1,7 @@
 package cz.encircled.ioc.core.factory;
 
 import cz.encircled.ioc.component.ComponentDefinition;
+import cz.encircled.ioc.core.ComponentPostProcessor;
 
 import java.util.List;
 
@@ -10,6 +11,8 @@ import java.util.List;
 public interface ComponentFactory {
 
     void registerDefinition(ComponentDefinition componentDefinition);
+
+    void registerPostProcessor(Class<? extends ComponentPostProcessor> componentPostProcessor);
 
     Object getComponent(String name);
 

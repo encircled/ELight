@@ -2,6 +2,7 @@ package cz.encircled.ioc.core.factory;
 
 import cz.encircled.ioc.component.ComponentDefinition;
 import cz.encircled.ioc.component.DependencyDescription;
+import cz.encircled.ioc.core.ComponentPostProcessor;
 import cz.encircled.ioc.exception.ComponentNotFoundException;
 import cz.encircled.ioc.exception.WiredMapGenericException;
 import cz.encircled.ioc.util.CollectionUtil;
@@ -27,12 +28,16 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     private Map<String, Object> singletonInstances = new HashMap<>(32);
 
+    private List<ComponentPostProcessor> componentPostProcessors = new ArrayList<>();
+
     @Override
     public void instantiateSingletons() {
         definitions.values().stream().forEach(definition -> {
             if (definition.isSingleton()) {
                 Object instance = ReflectionUtil.instance(definition.clazz);
-
+                for (ComponentPostProcessor processor : componentPostProcessors) {
+                    instance = processor.preProcess(instance);
+                }
                 singletonInstances.put(definition.name, instance);
             }
         });
@@ -47,6 +52,9 @@ public class DefaultComponentFactory implements ComponentFactory {
             if (definition.initMethod != null) {
                 ReflectionUtil.invokeMethod(definition.initMethod, instance);
             }
+            for (ComponentPostProcessor processor : componentPostProcessors) {
+                instance = processor.postProcess(instance);
+            }
         });
     }
 
@@ -59,6 +67,12 @@ public class DefaultComponentFactory implements ComponentFactory {
         // TODO exception
         log.debug("Register new definition for name {}", componentDefinition.name);
         definitions.put(componentDefinition.name, componentDefinition);
+    }
+
+    @Override
+    public void registerPostProcessor(Class<? extends ComponentPostProcessor> componentPostProcessor) {
+        log.debug("Register new post processor {}" + componentPostProcessor);
+        componentPostProcessors.add(ReflectionUtil.instance(componentPostProcessor));
     }
 
     @Override

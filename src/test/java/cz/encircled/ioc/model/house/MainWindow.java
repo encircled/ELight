@@ -1,4 +1,4 @@
-package cz.encircled.ioc.model;
+package cz.encircled.ioc.model.house;
 
 import cz.encircled.ioc.annotation.Component;
 import cz.encircled.ioc.annotation.Order;
@@ -7,6 +7,6 @@ import cz.encircled.ioc.annotation.Order;
  * Created by Encircled on 22-Dec-14.
  */
 @Component
-@Order(0)
-public class BathroomWindow implements Window {
+@Order(1)
+public class MainWindow implements Window {
 }

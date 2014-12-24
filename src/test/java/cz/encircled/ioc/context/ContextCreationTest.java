@@ -3,11 +3,11 @@ package cz.encircled.ioc.context;
 import cz.encircled.ioc.annotation.Order;
 import cz.encircled.ioc.core.context.AnnotationContext;
 import cz.encircled.ioc.exception.ComponentNotFoundException;
-import cz.encircled.ioc.model.Building;
-import cz.encircled.ioc.model.House;
-import cz.encircled.ioc.model.Window;
 import cz.encircled.ioc.model.condition.FalseConditionComponent;
 import cz.encircled.ioc.model.condition.TrueConditionComponent;
+import cz.encircled.ioc.model.house.Building;
+import cz.encircled.ioc.model.house.House;
+import cz.encircled.ioc.model.house.Window;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class ContextCreationTest {
 
     @BeforeClass
     public static void setupContext() {
-        context = new AnnotationContext("cz");
+        context = new AnnotationContext("cz.encircled.ioc");
     }
 
     @Test

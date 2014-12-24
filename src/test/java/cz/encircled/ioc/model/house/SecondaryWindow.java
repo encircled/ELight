@@ -1,4 +1,4 @@
-package cz.encircled.ioc.model;
+package cz.encircled.ioc.model.house;
 
 import cz.encircled.ioc.annotation.Component;
 import cz.encircled.ioc.annotation.Order;

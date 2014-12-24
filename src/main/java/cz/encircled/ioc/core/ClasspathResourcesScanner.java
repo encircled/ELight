@@ -2,6 +2,7 @@ package cz.encircled.ioc.core;
 
 import cz.encircled.ioc.annotation.Component;
 import cz.encircled.ioc.annotation.Conditional;
+import cz.encircled.ioc.core.factory.ComponentFactory;
 import cz.encircled.ioc.exception.RuntimeELightException;
 import cz.encircled.ioc.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,12 @@ public class ClasspathResourcesScanner {
     private static final String JAR = "jar";
 
     private static final String ZIP = "zip";
+
+    private ComponentFactory componentFactory;
+
+    public ClasspathResourcesScanner(ComponentFactory componentFactory) {
+        this.componentFactory = componentFactory;
+    }
 
     /**
      * Look-up for components in all packages starting from <code>rootPackage</code>
@@ -100,13 +107,20 @@ public class ClasspathResourcesScanner {
                     + jarEntry.getName());
             if (jarEntry.getName().startsWith(rootPackage) && jarEntry.getName().endsWith(".class")) {
                 String className = jarEntry.getName().replace("/", ".").substring(0, jarEntry.getName().length() - 6);
-                Class componentClass = Class.forName(className);
-                if (checkCandidate(componentClass)) {
-                    log.debug("New component annotated class {}", componentClass.getName());
-                    result.add(componentClass);
+                Class candidateClass = Class.forName(className);
+                if (isPostProcessor(candidateClass)) {
+                    componentFactory.registerPostProcessor(candidateClass);
+                }
+                if (checkCandidate(candidateClass)) {
+                    log.debug("New component annotated class {}", candidateClass.getName());
+                    result.add(candidateClass);
                 }
             }
         }
+    }
+
+    private boolean isPostProcessor(Class candidateClass) {
+        return ComponentPostProcessor.class.isAssignableFrom(candidateClass) && ReflectionUtil.isConcrete(candidateClass);
     }
 
     private boolean checkCandidate(Class<?> clazz) {
@@ -142,10 +156,13 @@ public class ClasspathResourcesScanner {
                     className = className.replace(File.separator, ".");
 
                     try {
-                        Class<?> componentClass = Class.forName(className);
-                        if (checkCandidate(componentClass)) {
-                            log.debug("New resource annotated class {}", componentClass.getName());
-                            result.add(componentClass);
+                        Class candidateClass = Class.forName(className);
+                        if (isPostProcessor(candidateClass)) {
+                            componentFactory.registerPostProcessor(candidateClass);
+                        }
+                        if (checkCandidate(candidateClass)) {
+                            log.debug("New resource annotated class {}", candidateClass.getName());
+                            result.add(candidateClass);
                         }
                     } catch (ClassNotFoundException c) {
                         log.debug("Class not found " + className);
