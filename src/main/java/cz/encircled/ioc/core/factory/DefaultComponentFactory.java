@@ -4,6 +4,7 @@ import cz.encircled.ioc.component.ComponentDefinition;
 import cz.encircled.ioc.component.DependencyDescription;
 import cz.encircled.ioc.core.ComponentPostProcessor;
 import cz.encircled.ioc.exception.ComponentNotFoundException;
+import cz.encircled.ioc.exception.DuplicatedComponentException;
 import cz.encircled.ioc.exception.WiredMapGenericException;
 import cz.encircled.ioc.util.CollectionUtil;
 import cz.encircled.ioc.util.ReflectionUtil;
@@ -34,10 +35,7 @@ public class DefaultComponentFactory implements ComponentFactory {
     public void instantiateSingletons() {
         definitions.values().stream().forEach(definition -> {
             if (definition.isSingleton()) {
-                Object instance = ReflectionUtil.instance(definition.clazz);
-                for (ComponentPostProcessor processor : componentPostProcessors) {
-                    instance = processor.preProcess(instance);
-                }
+                Object instance = instantiateComponent(definition);
                 singletonInstances.put(definition.name, instance);
             }
         });
@@ -49,23 +47,33 @@ public class DefaultComponentFactory implements ComponentFactory {
         });
         singletonInstances.forEach((name, instance) -> {
             ComponentDefinition definition = getDefinition(name);
-            if (definition.initMethod != null) {
-                ReflectionUtil.invokeMethod(definition.initMethod, instance);
-            }
-            for (ComponentPostProcessor processor : componentPostProcessors) {
-                instance = processor.postProcess(instance);
-            }
+            afterComponentInstantiation(instance, definition);
         });
     }
 
-    public void onContextInitializedFinish() {
-        //componentDefinition.superClasses.stream().forEach(c -> typeToName.put(c, componentDefinition.name));
+    private void afterComponentInstantiation(Object instance, ComponentDefinition definition) {
+        if (definition.initMethod != null) {
+            ReflectionUtil.invokeMethod(definition.initMethod, instance);
+        }
+        for (ComponentPostProcessor processor : componentPostProcessors) {
+            instance = processor.postProcess(instance);
+        }
+    }
+
+    private Object instantiateComponent(ComponentDefinition definition) {
+        Object instance = ReflectionUtil.instance(definition.clazz);
+        for (ComponentPostProcessor processor : componentPostProcessors) {
+            instance = processor.preProcess(instance);
+        }
+        return instance;
     }
 
     @Override
     public void registerDefinition(ComponentDefinition componentDefinition) {
-        // TODO exception
         log.debug("Register new definition for name {}", componentDefinition.name);
+        if (definitions.containsKey(componentDefinition.name)) {
+            throw new DuplicatedComponentException(componentDefinition.name);
+        }
         definitions.put(componentDefinition.name, componentDefinition);
     }
 
@@ -77,11 +85,23 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @Override
     public Object getComponent(String name) {
-        // TODO prototype
-        Object instance = singletonInstances.get(name);
-        if (instance == null) {
+        ComponentDefinition definition = definitions.get(name);
+        if (definition == null) {
             throw new ComponentNotFoundException(name);
         }
+        if (definition.isSingleton()) {
+            return singletonInstances.get(name);
+        } else {
+            return getInitializedPrototypeComponent(definition);
+        }
+    }
+
+    private Object getInitializedPrototypeComponent(ComponentDefinition definition) {
+        Object instance = instantiateComponent(definition);
+        definition.dependencies.forEach(dependency -> {
+            resolveDependency(definition.name, instance, dependency);
+        });
+        afterComponentInstantiation(instance, definition);
         return instance;
     }
 
@@ -93,10 +113,9 @@ public class DefaultComponentFactory implements ComponentFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getComponent(Class<T> type) {
-        // TODO exception
         for (ComponentDefinition definition : definitions.values()) {
             if (type.isAssignableFrom(definition.clazz)) {
-                return (T) singletonInstances.get(definition.name);
+                return (T) getComponent(definition.name);
             }
         }
         throw new ComponentNotFoundException(type);
@@ -148,10 +167,8 @@ public class DefaultComponentFactory implements ComponentFactory {
             List<Object> componentsForCollection = new ArrayList<>(definitionsByType.size());
             Collections.sort(definitionsByType, (o1, o2) -> Integer.compare(o1.order, o2.order));
             for (ComponentDefinition componentDefinition : definitionsByType) {
-                // TODO prototype scope
-                componentsForCollection.add(singletonInstances.get(componentDefinition.name));
+                componentsForCollection.add(getComponent(componentDefinition.name));
             }
-
             appropriateCollection.addAll(componentsForCollection);
             objToInject = appropriateCollection;
         } else if (type.isArray()) {
