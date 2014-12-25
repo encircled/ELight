@@ -1,7 +1,7 @@
 package cz.encircled.elight.model.house;
 
 
-import cz.encircled.elight.annotation.Wired;
+import cz.encircled.elight.core.annotation.Wired;
 
 import javax.annotation.PostConstruct;
 

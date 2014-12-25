@@ -1,6 +1,6 @@
 package cz.encircled.elight.core.creator;
 
-import cz.encircled.elight.util.ReflectionUtil;
+import cz.encircled.elight.core.util.ReflectionUtil;
 import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

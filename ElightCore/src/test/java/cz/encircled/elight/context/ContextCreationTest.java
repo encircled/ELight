@@ -1,6 +1,6 @@
 package cz.encircled.elight.context;
 
-import cz.encircled.elight.annotation.Order;
+import cz.encircled.elight.core.annotation.Order;
 import cz.encircled.elight.core.context.AnnotationContext;
 import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.model.condition.FalseConditionComponent;

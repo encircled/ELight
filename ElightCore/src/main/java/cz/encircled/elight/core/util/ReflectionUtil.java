@@ -1,4 +1,4 @@
-package cz.encircled.elight.util;
+package cz.encircled.elight.core.util;
 
 import cz.encircled.elight.core.exception.RuntimeELightException;
 import org.jetbrains.annotations.NotNull;

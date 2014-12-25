@@ -1,8 +1,8 @@
 package cz.encircled.elight.model.prototype;
 
 
-import cz.encircled.elight.annotation.Component;
-import cz.encircled.elight.annotation.Scope;
+import cz.encircled.elight.core.annotation.Component;
+import cz.encircled.elight.core.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 

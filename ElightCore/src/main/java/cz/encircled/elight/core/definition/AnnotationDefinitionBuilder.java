@@ -1,11 +1,11 @@
 package cz.encircled.elight.core.definition;
 
-import cz.encircled.elight.annotation.*;
 import cz.encircled.elight.core.DependencyDescription;
+import cz.encircled.elight.core.annotation.*;
 import cz.encircled.elight.core.context.ContextConstants;
 import cz.encircled.elight.core.creator.InstanceCreator;
-import cz.encircled.elight.util.ComponentUtil;
-import cz.encircled.elight.util.ReflectionUtil;
+import cz.encircled.elight.core.util.ComponentUtil;
+import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;

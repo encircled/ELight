@@ -1,7 +1,7 @@
 package cz.encircled.elight.model.postprocess;
 
 
-import cz.encircled.elight.annotation.Component;
+import cz.encircled.elight.core.annotation.Component;
 
 import javax.annotation.PostConstruct;
 

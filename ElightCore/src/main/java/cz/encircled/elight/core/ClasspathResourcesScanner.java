@@ -1,10 +1,10 @@
 package cz.encircled.elight.core;
 
-import cz.encircled.elight.annotation.Component;
-import cz.encircled.elight.annotation.Conditional;
+import cz.encircled.elight.core.annotation.Component;
+import cz.encircled.elight.core.annotation.Conditional;
 import cz.encircled.elight.core.exception.RuntimeELightException;
 import cz.encircled.elight.core.factory.ComponentFactory;
-import cz.encircled.elight.util.ReflectionUtil;
+import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,7 +79,7 @@ public class ClasspathResourcesScanner {
                 getComponentsFromJar(rootPackage, url, result);
             } else {
                 int pathPrefixLength = url.getFile().length()
-                        - rootPackage.length() - 1;
+                        - rootPackage.length() - 2;
                 File rootFile = new File(url.getFile());
                 recursiveList(rootFile, pathPrefixLength, result);
             }

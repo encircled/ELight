@@ -1,8 +1,8 @@
 package cz.encircled.elight.model.house;
 
 
-import cz.encircled.elight.annotation.Component;
-import cz.encircled.elight.annotation.Wired;
+import cz.encircled.elight.core.annotation.Component;
+import cz.encircled.elight.core.annotation.Wired;
 
 import java.util.List;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package cz.encircled.elight.core.exception;
 
 
-import cz.encircled.elight.util.CollectionUtil;
+import cz.encircled.elight.core.util.CollectionUtil;
 
 /**
  * Created by Encircled on 22-Dec-14.

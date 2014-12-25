@@ -1,6 +1,4 @@
-package cz.encircled.elight.annotation;
-
-import cz.encircled.elight.core.creator.InstanceCreator;
+package cz.encircled.elight.core.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,12 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Encircled on 19/09/2014.
+ * Created by encircled on 9/19/14.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Factory {
+public @interface Scope {
 
-    Class<? extends InstanceCreator> value();
+    public static final String PROTOTYPE = "prototype";
+
+    String value() default "singleton";
 
 }

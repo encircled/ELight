@@ -1,8 +1,8 @@
 package cz.encircled.elight.model.prototype;
 
 
-import cz.encircled.elight.annotation.Component;
-import cz.encircled.elight.annotation.Wired;
+import cz.encircled.elight.core.annotation.Component;
+import cz.encircled.elight.core.annotation.Wired;
 
 /**
  * Created by Encircled on 24-Dec-14.

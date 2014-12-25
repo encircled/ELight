@@ -1,4 +1,4 @@
-package cz.encircled.elight.annotation;
+package cz.encircled.elight.core.annotation;
 
 import cz.encircled.elight.core.context.ContextConstants;
 

@@ -1,8 +1,8 @@
 package cz.encircled.elight.model.condition;
 
 
-import cz.encircled.elight.annotation.Component;
 import cz.encircled.elight.core.ComponentCondition;
+import cz.encircled.elight.core.annotation.Component;
 
 /**
  * Created by Encircled on 22-Dec-14.
