@@ -4,6 +4,7 @@ import cz.encircled.elight.core.annotation.Component;
 import cz.encircled.elight.core.annotation.Conditional;
 import cz.encircled.elight.core.exception.RuntimeELightException;
 import cz.encircled.elight.core.factory.ComponentFactory;
+import cz.encircled.elight.core.util.IOUtil;
 import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -78,10 +79,19 @@ public class ClasspathResourcesScanner {
             if (isJar(url.getProtocol())) {
                 getComponentsFromJar(rootPackage, url, result);
             } else {
-                int pathPrefixLength = url.getFile().length()
-                        - rootPackage.length() - 2;
-                File rootFile = new File(url.getFile());
-                recursiveList(rootFile, pathPrefixLength, result);
+                List<File> filesInFolder = IOUtil.getFilesInFolder(url.getFile(), ".*\\.class");
+                for (File f : filesInFolder) {
+                    String className = f.getPath().substring(url.getFile().length()
+                            - rootPackage.length() - 1).replaceAll("\\\\", ".");
+                    className = IOUtil.getFileNameWithoutType(className);
+                    System.out.println("TEST : " + className);
+                    Class clazz = Class.forName(className);
+                    result.add(clazz);
+                }
+//                int pathPrefixLength = url.getFile().length()
+//                        - rootPackage.length() - 2;
+//                File rootFile = new File(url.getFile());
+//                recursiveList(rootFile, pathPrefixLength, result);
             }
 
         }
@@ -171,6 +181,46 @@ public class ClasspathResourcesScanner {
 
                 } else {
                     recursiveList(f, pathPrefixLength, result);
+                }
+            }
+        }
+    }
+
+    private void recursiveList2(File rootFile, int pathPrefixLength,
+                                Collection<Class<?>> result) {
+        File[] files = rootFile.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.isFile()) {
+                    String className = rootFile
+                            + "."
+                            + f.getName()
+                            .substring(0, f.getName().length() - 6);
+                    className = className.substring(pathPrefixLength,
+                            className.length());
+
+                    if (className.startsWith(File.separator)) {
+                        className = className.substring(1);
+                    }
+
+                    className = className.replace(File.separator, ".");
+
+                    try {
+                        Class candidateClass = Class.forName(className);
+                        if (isPostProcessor(candidateClass)) {
+                            componentFactory.registerPostProcessor(candidateClass);
+                        }
+                        if (checkCandidate(candidateClass)) {
+                            log.debug("New resource annotated class {}", candidateClass.getName());
+                            result.add(candidateClass);
+                        }
+                    } catch (ClassNotFoundException c) {
+                        log.debug("Class not found " + className);
+                    }
+
+
+                } else {
+                    recursiveList2(f, pathPrefixLength, result);
                 }
             }
         }
