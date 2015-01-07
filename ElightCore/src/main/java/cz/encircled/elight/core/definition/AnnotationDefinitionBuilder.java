@@ -9,6 +9,7 @@ import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;

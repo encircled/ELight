@@ -84,16 +84,16 @@ public class ClasspathResourcesScanner {
                     String className = f.getPath().substring(url.getFile().length()
                             - rootPackage.length() - 1).replaceAll("\\\\", ".");
                     className = IOUtil.getFileNameWithoutType(className);
-                    System.out.println("TEST : " + className);
-                    Class clazz = Class.forName(className);
-                    result.add(clazz);
+                    Class candidateClass = Class.forName(className);
+                    if (isPostProcessor(candidateClass)) {
+                        componentFactory.registerPostProcessor(candidateClass);
+                    }
+                    if (checkCandidate(candidateClass)) {
+                        log.debug("New resource annotated class {}", candidateClass.getName());
+                        result.add(candidateClass);
+                    }
                 }
-//                int pathPrefixLength = url.getFile().length()
-//                        - rootPackage.length() - 2;
-//                File rootFile = new File(url.getFile());
-//                recursiveList(rootFile, pathPrefixLength, result);
             }
-
         }
         return result;
     }
@@ -113,8 +113,6 @@ public class ClasspathResourcesScanner {
 
         while (entries.hasMoreElements()) {
             JarEntry jarEntry = entries.nextElement();
-            System.out.println("Next jar entry "
-                    + jarEntry.getName());
             if (jarEntry.getName().startsWith(rootPackage) && jarEntry.getName().endsWith(".class")) {
                 String className = jarEntry.getName().replace("/", ".").substring(0, jarEntry.getName().length() - 6);
                 Class candidateClass = Class.forName(className);
@@ -144,86 +142,6 @@ public class ClasspathResourcesScanner {
 
     private boolean isJar(String protocol) {
         return JAR.equals(protocol) || ZIP.equals(protocol);
-    }
-
-    private void recursiveList(File rootFile, int pathPrefixLength,
-                               Collection<Class<?>> result) throws ClassNotFoundException {
-        File[] files = rootFile.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                if (f.isFile()) {
-                    String className = rootFile
-                            + "."
-                            + f.getName()
-                            .substring(0, f.getName().length() - 6);
-                    className = className.substring(pathPrefixLength,
-                            className.length());
-
-                    if (className.startsWith(File.separator)) {
-                        className = className.substring(1);
-                    }
-
-                    className = className.replace(File.separator, ".");
-
-                    try {
-                        Class candidateClass = Class.forName(className);
-                        if (isPostProcessor(candidateClass)) {
-                            componentFactory.registerPostProcessor(candidateClass);
-                        }
-                        if (checkCandidate(candidateClass)) {
-                            log.debug("New resource annotated class {}", candidateClass.getName());
-                            result.add(candidateClass);
-                        }
-                    } catch (ClassNotFoundException c) {
-                        log.debug("Class not found " + className);
-                    }
-
-
-                } else {
-                    recursiveList(f, pathPrefixLength, result);
-                }
-            }
-        }
-    }
-
-    private void recursiveList2(File rootFile, int pathPrefixLength,
-                                Collection<Class<?>> result) {
-        File[] files = rootFile.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                if (f.isFile()) {
-                    String className = rootFile
-                            + "."
-                            + f.getName()
-                            .substring(0, f.getName().length() - 6);
-                    className = className.substring(pathPrefixLength,
-                            className.length());
-
-                    if (className.startsWith(File.separator)) {
-                        className = className.substring(1);
-                    }
-
-                    className = className.replace(File.separator, ".");
-
-                    try {
-                        Class candidateClass = Class.forName(className);
-                        if (isPostProcessor(candidateClass)) {
-                            componentFactory.registerPostProcessor(candidateClass);
-                        }
-                        if (checkCandidate(candidateClass)) {
-                            log.debug("New resource annotated class {}", candidateClass.getName());
-                            result.add(candidateClass);
-                        }
-                    } catch (ClassNotFoundException c) {
-                        log.debug("Class not found " + className);
-                    }
-
-
-                } else {
-                    recursiveList2(f, pathPrefixLength, result);
-                }
-            }
-        }
     }
 
 }
