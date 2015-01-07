@@ -26,7 +26,7 @@ public class ComponentDefinition {
 
     public List<DependencyDescription> dependencies;
 
-    public Class<? extends InstanceCreator> componentInstanceCreator;
+    public Class<? extends InstanceCreator> instanceCreator;
 
     public Method initMethod;
 
@@ -36,8 +36,8 @@ public class ComponentDefinition {
         this.clazz = clazz;
     }
 
-    public boolean hasFactory() {
-        return componentInstanceCreator != null;
+    public boolean hasInstanceCreator() {
+        return instanceCreator != null;
     }
 
     public boolean isSingleton() {

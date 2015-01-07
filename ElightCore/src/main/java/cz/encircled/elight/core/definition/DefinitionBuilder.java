@@ -22,7 +22,7 @@ public abstract class DefinitionBuilder {
 
         Class<? extends InstanceCreator> creator = getInstanceCreator(clazz);
         if (creator != null)
-            definition.componentInstanceCreator = creator;
+            definition.instanceCreator = creator;
 
         String scope = getScope(clazz);
         definition.isSingleton = scope == null || scope.equals(ComponentDefinition.SINGLETON);
@@ -32,9 +32,12 @@ public abstract class DefinitionBuilder {
         definition.destroyMethodName = getDestroyMethodName(clazz);
         definition.dependencies = getDependencyDescriptions(definition.clazz);
         definition.order = getOrder(definition.clazz);
+        definition.instanceCreator = getComponentInstanceCreator(definition.clazz);
 
         return definition;
     }
+
+    protected abstract Class<? extends InstanceCreator> getComponentInstanceCreator(Class<?> clazz);
 
     protected abstract int getOrder(Class<?> clazz);
 

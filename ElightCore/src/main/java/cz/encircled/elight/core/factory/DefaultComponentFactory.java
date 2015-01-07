@@ -61,7 +61,13 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     private Object instantiateComponent(ComponentDefinition definition) {
-        Object instance = ReflectionUtil.instance(definition.clazz);
+        Object instance;
+        if (definition.hasInstanceCreator()) {
+            log.debug("Instantiate {} with creator: {}", definition, definition.instanceCreator);
+            instance = ReflectionUtil.instance(definition.instanceCreator).createInstance(definition.clazz);
+        } else {
+            instance = ReflectionUtil.instance(definition.clazz);
+        }
         for (ComponentPostProcessor processor : componentPostProcessors) {
             instance = processor.preProcess(instance);
         }
