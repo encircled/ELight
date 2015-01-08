@@ -97,7 +97,7 @@ public class DefaultComponentFactory implements ComponentFactory {
     @Override
     public Object getComponent(String name) {
         Object resolvedComponent = resolvedDependencies.get(name);
-        if(resolvedComponent != null) {
+        if (resolvedComponent != null) {
             return resolvedComponent;
         }
         ComponentDefinition definition = definitions.get(name);
@@ -128,8 +128,8 @@ public class DefaultComponentFactory implements ComponentFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getComponent(Class<T> type) {
-        for(Object candidate : resolvedDependencies.values()) {
-            if(type.isAssignableFrom(candidate.getClass())) {
+        for (Object candidate : resolvedDependencies.values()) {
+            if (type.isAssignableFrom(candidate.getClass())) {
                 return (T) candidate;
             }
         }
@@ -146,8 +146,8 @@ public class DefaultComponentFactory implements ComponentFactory {
     @NotNull
     public <T> List<T> getComponents(Class<T> type) {
         List<T> components = new ArrayList<>();
-        for(Object candidate : resolvedDependencies.values()) {
-            if(type.isAssignableFrom(candidate.getClass())) {
+        for (Object candidate : resolvedDependencies.values()) {
+            if (type.isAssignableFrom(candidate.getClass())) {
                 components.add((T) candidate);
             }
         }
@@ -161,8 +161,8 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @Override
     public boolean containsComponent(Class<?> clazz) {
-        for(Object candidate : resolvedDependencies.values()) {
-            if(clazz.isAssignableFrom(candidate.getClass())) {
+        for (Object candidate : resolvedDependencies.values()) {
+            if (clazz.isAssignableFrom(candidate.getClass())) {
                 return true;
             }
         }
@@ -182,10 +182,10 @@ public class DefaultComponentFactory implements ComponentFactory {
     @Override
     public void addResolvedDependency(Object component, String name) {
         log.debug("Add resolved property: name {} for object {}", name, component);
-        if(StringUtils.isEmpty(name) || component == null) {
+        if (StringUtils.isEmpty(name) || component == null) {
             throw new RuntimeELightException("Illegal arguments");
         }
-        if(definitions.containsKey(name) || resolvedDependencies.containsKey(name)) {
+        if (definitions.containsKey(name) || resolvedDependencies.containsKey(name)) {
             throw new DuplicatedComponentException(name);
         }
         resolvedDependencies.put(name, component);
@@ -212,8 +212,8 @@ public class DefaultComponentFactory implements ComponentFactory {
                 componentsForCollection.add(getComponent(componentDefinition.name));
             }
             appropriateCollection.addAll(componentsForCollection);
-            for(Object candidate : resolvedDependencies.values()) {
-                if(genericClass.isAssignableFrom(candidate.getClass())) {
+            for (Object candidate : resolvedDependencies.values()) {
+                if (genericClass.isAssignableFrom(candidate.getClass())) {
                     appropriateCollection.add(candidate);
                 }
             }
