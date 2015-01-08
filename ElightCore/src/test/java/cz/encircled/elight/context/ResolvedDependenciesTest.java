@@ -2,6 +2,7 @@ package cz.encircled.elight.context;
 
 import cz.encircled.elight.core.context.AnnotationApplicationContext;
 import cz.encircled.elight.core.context.ApplicationContext;
+import cz.encircled.elight.model.resolved.CollectionOfResolved;
 import cz.encircled.elight.model.resolved.ResolvedObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -12,11 +13,11 @@ import org.junit.Test;
  */
 public class ResolvedDependenciesTest {
 
-    private static AnnotationApplicationContext context;
+    private static ApplicationContext context;
 
     @BeforeClass
     public static void setupContext() {
-        context = new AnnotationApplicationContext("cz.encircled.elight");
+        context = new AnnotationApplicationContext("cz.encircled.elight").initialize();
     }
 
     @Test
@@ -45,6 +46,32 @@ public class ResolvedDependenciesTest {
 
         Assert.assertNotNull(resolved);
         Assert.assertEquals(resolvedObject.initTime, resolved.initTime);
+    }
+
+    @Test
+    public void testAddResolvedBeforeInitialize() {
+        ApplicationContext applicationContext = new AnnotationApplicationContext("cz.encircled.elight.model.resolved");
+        applicationContext.addResolvedDependency(new ResolvedObject());
+        applicationContext.initialize();
+        Assert.assertNotNull(applicationContext.getComponent("resolvedObject"));
+        Assert.assertNotNull(applicationContext.getComponent(ResolvedObject.class));
+    }
+
+    @Test
+    public void testResolvedCollections() {
+        ApplicationContext applicationContext = new AnnotationApplicationContext("cz.encircled.elight.model.resolved");
+        applicationContext.addResolvedDependency(new ResolvedObject());
+        applicationContext.initialize();
+
+        CollectionOfResolved withoutResolved = context.getComponent(CollectionOfResolved.class);
+        Assert.assertTrue(withoutResolved.resolvedObjectsArray.length == 1);
+        Assert.assertTrue(withoutResolved.resolvedObjectsList.size() == 1);
+        Assert.assertTrue(withoutResolved.resolvedObjectsMap.size() == 1);
+
+        CollectionOfResolved withResolved = applicationContext.getComponent(CollectionOfResolved.class);
+        Assert.assertTrue(withResolved.resolvedObjectsArray.length == 2);
+        Assert.assertTrue(withResolved.resolvedObjectsList.size() == 2);
+        Assert.assertTrue(withResolved.resolvedObjectsMap.size() == 2);
     }
 
 }

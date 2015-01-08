@@ -16,16 +16,25 @@ public class AnnotationApplicationContext extends AbstractApplicationContext imp
 
     private static final Logger log = LogManager.getLogger();
 
+    public String rootPackage;
+
     public AnnotationApplicationContext(String rootPackage) {
-        log.debug("Annotation context start");
+        log.debug("Annotation context create");
+        this.rootPackage = rootPackage;
         componentFactory = new DefaultComponentFactory();
         definitionBuilder = new AnnotationDefinitionBuilder();
+    }
+
+    @Override
+    public ApplicationContext initialize() {
+        log.debug("Annotation context initializing...");
 
         List<Class<?>> componentClasses = new ClasspathResourcesScanner(componentFactory).findComponentClasses(rootPackage);
         componentClasses.parallelStream().forEach(c -> {
             componentFactory.registerDefinition(definitionBuilder.buildDefinition(c));
         });
         startContext();
+        return this;
     }
 
 }

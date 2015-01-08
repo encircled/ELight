@@ -20,4 +20,6 @@ public interface ApplicationContext {
 
     void addResolvedDependency(Object component);
 
+    ApplicationContext initialize();
+
 }

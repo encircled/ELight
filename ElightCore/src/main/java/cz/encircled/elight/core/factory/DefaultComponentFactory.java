@@ -146,6 +146,11 @@ public class DefaultComponentFactory implements ComponentFactory {
     @NotNull
     public <T> List<T> getComponents(Class<T> type) {
         List<T> components = new ArrayList<>();
+        for(Object candidate : resolvedDependencies.values()) {
+            if(type.isAssignableFrom(candidate.getClass())) {
+                components.add((T) candidate);
+            }
+        }
         for (ComponentDefinition definition : definitions.values()) {
             if (type.isAssignableFrom(definition.clazz)) {
                 components.add((T) singletonInstances.get(definition.name));
@@ -155,7 +160,12 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     @Override
-    public boolean containsType(Class<?> clazz) {
+    public boolean containsComponent(Class<?> clazz) {
+        for(Object candidate : resolvedDependencies.values()) {
+            if(clazz.isAssignableFrom(candidate.getClass())) {
+                return true;
+            }
+        }
         for (ComponentDefinition definition : definitions.values()) {
             if (clazz.isAssignableFrom(definition.clazz)) {
                 return true;
@@ -165,7 +175,13 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     @Override
+    public boolean containsComponent(String name) {
+        return resolvedDependencies.containsKey(name) || definitions.containsKey(name);
+    }
+
+    @Override
     public void addResolvedDependency(Object component, String name) {
+        log.debug("Add resolved property: name {} for object {}", name, component);
         if(StringUtils.isEmpty(name) || component == null) {
             throw new RuntimeELightException("Illegal arguments");
         }
@@ -186,7 +202,7 @@ public class DefaultComponentFactory implements ComponentFactory {
         Class<?> type = dependency.targetField.getType();
         Object objToInject;
         if (Collection.class.isAssignableFrom(type)) {
-            Class<?> genericClass = ReflectionUtil.getGenericClasses(dependency.targetField)[0];
+            Class<Object> genericClass = ReflectionUtil.getGenericClasses(dependency.targetField)[0];
             Collection<Object> appropriateCollection = CollectionUtil.getAppropriateCollection((Class<? extends Collection<Object>>) type);
 
             List<ComponentDefinition> definitionsByType = getDefinitions(genericClass);
@@ -196,6 +212,11 @@ public class DefaultComponentFactory implements ComponentFactory {
                 componentsForCollection.add(getComponent(componentDefinition.name));
             }
             appropriateCollection.addAll(componentsForCollection);
+            for(Object candidate : resolvedDependencies.values()) {
+                if(genericClass.isAssignableFrom(candidate.getClass())) {
+                    appropriateCollection.add(candidate);
+                }
+            }
             objToInject = appropriateCollection;
         } else if (type.isArray()) {
 

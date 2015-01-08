@@ -1,6 +1,7 @@
 package cz.encircled.elight.scanner;
 
 import cz.encircled.elight.core.context.AnnotationApplicationContext;
+import cz.encircled.elight.core.context.ApplicationContext;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ public class ClasspathScannerTest {
 
     @Test
     public void scannerTest() {
-        AnnotationApplicationContext context = new AnnotationApplicationContext(this.getClass().getPackage().getName());
+        ApplicationContext context = new AnnotationApplicationContext(this.getClass().getPackage().getName()).initialize();
         Assert.assertTrue(context.containsComponent("wow"));
         Assert.assertTrue(context.containsComponent(ScannerTestComponent.class));
     }

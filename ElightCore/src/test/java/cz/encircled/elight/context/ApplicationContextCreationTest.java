@@ -2,6 +2,7 @@ package cz.encircled.elight.context;
 
 import cz.encircled.elight.core.annotation.Order;
 import cz.encircled.elight.core.context.AnnotationApplicationContext;
+import cz.encircled.elight.core.context.ApplicationContext;
 import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.model.condition.FalseConditionComponent;
 import cz.encircled.elight.model.condition.TrueConditionComponent;
@@ -19,11 +20,11 @@ import java.util.Map;
  */
 public class ApplicationContextCreationTest {
 
-    private static AnnotationApplicationContext context;
+    private static ApplicationContext context;
 
     @BeforeClass
     public static void setupContext() {
-        context = new AnnotationApplicationContext("cz.encircled.elight");
+        context = new AnnotationApplicationContext("cz.encircled.elight").initialize();
     }
 
     @Test
@@ -84,6 +85,17 @@ public class ApplicationContextCreationTest {
         House house = context.getComponent(House.class);
         Assert.assertNotNull(house.getWindowsArray());
         Assert.assertTrue(house.getWindowsArray().length > 0);
+    }
+
+    @Test
+    public void containsComponentTest() {
+        Assert.assertTrue(context.containsComponent(ApplicationContext.class));
+        Assert.assertTrue(context.containsComponent("applicationContext"));
+
+        Assert.assertTrue(context.containsComponent("house"));
+
+        Assert.assertFalse(context.containsComponent("notExistingComponent"));
+        Assert.assertFalse(context.containsComponent(this.getClass()));
     }
 
 }

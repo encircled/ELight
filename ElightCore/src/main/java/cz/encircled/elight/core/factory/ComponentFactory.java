@@ -20,7 +20,9 @@ public interface ComponentFactory {
 
     <T> List<T> getComponents(Class<T> type);
 
-    boolean containsType(Class<?> clazz);
+    boolean containsComponent(Class<?> clazz);
+
+    boolean containsComponent(String name);
 
     void addResolvedDependency(Object component, String name);
 

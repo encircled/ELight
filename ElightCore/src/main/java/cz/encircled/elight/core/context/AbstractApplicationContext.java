@@ -2,7 +2,6 @@ package cz.encircled.elight.core.context;
 
 import cz.encircled.elight.core.definition.AnnotationDefinitionBuilder;
 import cz.encircled.elight.core.definition.DefinitionBuilder;
-import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.core.factory.ComponentFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -36,24 +35,12 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     @Override
     public boolean containsComponent(String name) {
-        // TODO
-        try {
-            getComponent(name);
-            return true;
-        } catch (ComponentNotFoundException e) {
-            return false;
-        }
+        return componentFactory.containsComponent(name);
     }
 
     @Override
     public boolean containsComponent(Class<?> clazz) {
-        // TODO
-        try {
-            getComponent(clazz);
-            return true;
-        } catch (ComponentNotFoundException e) {
-            return false;
-        }
+        return componentFactory.containsComponent(clazz);
     }
 
     /**
@@ -63,7 +50,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      */
     @Override
     public void addResolvedDependency(Object component, String name) {
-        if(StringUtils.isEmpty(name)) {
+        if (StringUtils.isEmpty(name)) {
             name = definitionBuilder.getName(component.getClass());
         }
         componentFactory.addResolvedDependency(component, name);
@@ -75,8 +62,8 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     }
 
     public void startContext() {
-        componentFactory.instantiateSingletons();
         addResolvedDependency(this, "applicationContext");
+        componentFactory.instantiateSingletons();
     }
 
 }
