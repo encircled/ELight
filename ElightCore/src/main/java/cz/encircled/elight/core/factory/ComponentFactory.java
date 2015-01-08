@@ -28,4 +28,5 @@ public interface ComponentFactory {
 
     void instantiateSingletons();
 
+    void onDestroy();
 }

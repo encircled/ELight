@@ -55,6 +55,16 @@ public class DefaultComponentFactory implements ComponentFactory {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        log.debug("Call singletons PreDestroy methods");
+        for(ComponentDefinition definition : definitions.values()) {
+            if(definition.isSingleton && definition.destroyMethod != null) {
+                ReflectionUtil.invokeMethod(definition.destroyMethod, getComponent(definition.name));
+            }
+        }
+    }
+
     private void afterComponentInstantiation(Object instance, ComponentDefinition definition) {
         if (definition.initMethod != null) {
             ReflectionUtil.invokeMethod(definition.initMethod, instance);

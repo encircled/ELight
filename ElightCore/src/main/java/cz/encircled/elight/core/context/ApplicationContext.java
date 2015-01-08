@@ -22,4 +22,6 @@ public interface ApplicationContext {
 
     ApplicationContext initialize();
 
+    void destroy();
+
 }

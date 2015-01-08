@@ -29,7 +29,7 @@ public abstract class DefinitionBuilder {
 
         definition.name = getName(clazz);
         definition.initMethod = getInitMethod(clazz);
-        definition.destroyMethodName = getDestroyMethodName(clazz);
+        definition.destroyMethod = getDestroyMethod(clazz);
         definition.dependencies = getDependencyDescriptions(definition.clazz);
         definition.order = getOrder(definition.clazz);
         definition.instanceCreator = getComponentInstanceCreator(definition.clazz);
@@ -43,7 +43,7 @@ public abstract class DefinitionBuilder {
 
     protected abstract int getOrder(Class<?> clazz);
 
-    protected abstract String getDestroyMethodName(Class<?> clazz);
+    protected abstract Method getDestroyMethod(Class<?> clazz);
 
     protected abstract Method getInitMethod(Class<?> clazz);
 

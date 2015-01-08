@@ -30,7 +30,7 @@ public class ComponentDefinition {
 
     public Method initMethod;
 
-    public String destroyMethodName;
+    public Method destroyMethod;
 
     public ComponentDefinition(Class<?> clazz) {
         this.clazz = clazz;

@@ -43,6 +43,14 @@ public class ReflectionUtil {
         }
     }
 
+    public static Object invokeMethod(String methodName, Object instance) {
+        try {
+            return invokeMethod(instance.getClass().getMethod(methodName), instance);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeELightException(e);
+        }
+    }
+
     public static void setField(Object instance, Field field, Object value) {
         try {
             field.setAccessible(true);

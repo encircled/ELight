@@ -19,6 +19,8 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     protected ComponentFactory componentFactory;
 
+    private volatile boolean isDestroyed;
+
     public AbstractApplicationContext() {
         definitionBuilder = new AnnotationDefinitionBuilder();
     }
@@ -59,6 +61,16 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     @Override
     public void addResolvedDependency(Object component) {
         addResolvedDependency(component, null);
+    }
+
+    @Override
+    public void destroy() {
+        log.debug("Context destroy attempt");
+        if(isDestroyed) {
+            log.debug("Context is already destroyed");
+        }
+        isDestroyed = true;
+        componentFactory.onDestroy();
     }
 
     public void startContext() {

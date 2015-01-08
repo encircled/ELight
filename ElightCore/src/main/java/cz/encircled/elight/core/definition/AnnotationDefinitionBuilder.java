@@ -9,6 +9,7 @@ import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
     }
 
     @Override
-    protected String getDestroyMethodName(Class<?> clazz) {
-        return null;
+    protected Method getDestroyMethod(Class<?> clazz) {
+        return ReflectionUtil.findAnnotatedMethod(clazz, PreDestroy.class);
     }
 
     @Override

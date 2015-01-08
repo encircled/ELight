@@ -52,4 +52,9 @@ public class House extends AbstractHouse implements Building {
     public boolean isInitCalled() {
         return initCalled;
     }
+
+    public boolean isDestroyCalled() {
+        return destroyCalled;
+    }
+
 }
