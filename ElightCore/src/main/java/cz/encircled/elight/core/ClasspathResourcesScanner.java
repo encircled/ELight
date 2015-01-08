@@ -11,19 +11,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.regex.Pattern;
 
 /**
  * Created by encircled on 9/19/14.
@@ -32,13 +28,7 @@ public class ClasspathResourcesScanner {
 
     private static final Logger log = LogManager.getLogger();
 
-    private static final Pattern CLASS_PATTERN = Pattern.compile("^[^\\$]+\\.class$");
-
-    private static final FileFilter FILE_FILTER = pathname -> pathname.isDirectory() || CLASS_PATTERN.matcher(pathname.getName()).matches();
-
     public static final String DOT = "\\.";
-
-    public static final String CLASS_SEPARATOR = "/";
 
     private static final String JAR = "jar";
 
@@ -132,7 +122,7 @@ public class ClasspathResourcesScanner {
     }
 
     private boolean checkCandidate(Class<?> clazz) {
-        return clazz.getAnnotation(Component.class) != null && !Modifier.isAbstract(clazz.getModifiers()) && checkCondition(clazz);
+        return clazz.getAnnotation(Component.class) != null && ReflectionUtil.isConcrete(clazz) && checkCondition(clazz);
     }
 
     private boolean checkCondition(Class<?> clazz) {
