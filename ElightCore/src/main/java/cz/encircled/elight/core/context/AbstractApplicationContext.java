@@ -4,6 +4,7 @@ import cz.encircled.elight.core.definition.AnnotationDefinitionBuilder;
 import cz.encircled.elight.core.definition.DefinitionBuilder;
 import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.core.factory.ComponentFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Created by encircled on 9/19/14.
  */
-public abstract class AbstractContext implements Context {
+public abstract class AbstractApplicationContext implements ApplicationContext {
 
     private static final Logger log = LogManager.getLogger();
 
@@ -19,7 +20,7 @@ public abstract class AbstractContext implements Context {
 
     protected ComponentFactory componentFactory;
 
-    public AbstractContext() {
+    public AbstractApplicationContext() {
         definitionBuilder = new AnnotationDefinitionBuilder();
     }
 
@@ -35,6 +36,7 @@ public abstract class AbstractContext implements Context {
 
     @Override
     public boolean containsComponent(String name) {
+        // TODO
         try {
             getComponent(name);
             return true;
@@ -45,6 +47,7 @@ public abstract class AbstractContext implements Context {
 
     @Override
     public boolean containsComponent(Class<?> clazz) {
+        // TODO
         try {
             getComponent(clazz);
             return true;
@@ -59,12 +62,21 @@ public abstract class AbstractContext implements Context {
      * @param component - component instance
      */
     @Override
-    public void addComponent(Object component) {
-//        componentFactory.addComponent();
+    public void addResolvedDependency(Object component, String name) {
+        if(StringUtils.isEmpty(name)) {
+            name = definitionBuilder.getName(component.getClass());
+        }
+        componentFactory.addResolvedDependency(component, name);
+    }
+
+    @Override
+    public void addResolvedDependency(Object component) {
+        addResolvedDependency(component, null);
     }
 
     public void startContext() {
         componentFactory.instantiateSingletons();
+        addResolvedDependency(this, "applicationContext");
     }
 
 }

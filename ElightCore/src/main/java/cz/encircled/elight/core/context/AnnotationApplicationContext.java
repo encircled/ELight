@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * Created by Encircled on 11/09/2014.
  */
-public class AnnotationContext extends AbstractContext implements Context {
+public class AnnotationApplicationContext extends AbstractApplicationContext implements ApplicationContext {
 
     private static final Logger log = LogManager.getLogger();
 
-    public AnnotationContext(String rootPackage) {
+    public AnnotationApplicationContext(String rootPackage) {
         log.debug("Annotation context start");
         componentFactory = new DefaultComponentFactory();
         definitionBuilder = new AnnotationDefinitionBuilder();

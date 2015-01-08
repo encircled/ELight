@@ -9,7 +9,6 @@ import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -47,9 +46,9 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
     }
 
     @Override
-    protected String getName(Class<?> clazz) {
+    public String getName(Class<?> clazz) {
         Component annotation = clazz.getAnnotation(Component.class);
-        return StringUtils.isEmpty(annotation.value()) ? ComponentUtil.getName(clazz) : annotation.value();
+        return annotation == null || StringUtils.isEmpty(annotation.value()) ? ComponentUtil.getName(clazz) : annotation.value();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package cz.encircled.elight.context;
 
 import cz.encircled.elight.core.annotation.Order;
-import cz.encircled.elight.core.context.AnnotationContext;
+import cz.encircled.elight.core.context.AnnotationApplicationContext;
 import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.model.condition.FalseConditionComponent;
 import cz.encircled.elight.model.condition.TrueConditionComponent;
@@ -17,13 +17,13 @@ import java.util.Map;
 /**
  * Created by Encircled on 22-Dec-14.
  */
-public class ContextCreationTest {
+public class ApplicationContextCreationTest {
 
-    private static AnnotationContext context;
+    private static AnnotationApplicationContext context;
 
     @BeforeClass
     public static void setupContext() {
-        context = new AnnotationContext("cz.encircled.elight");
+        context = new AnnotationApplicationContext("cz.encircled.elight");
     }
 
     @Test

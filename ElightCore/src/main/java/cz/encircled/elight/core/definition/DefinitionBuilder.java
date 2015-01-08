@@ -37,6 +37,8 @@ public abstract class DefinitionBuilder {
         return definition;
     }
 
+    public abstract String getName(Class<?> clazz);
+
     protected abstract Class<? extends InstanceCreator> getComponentInstanceCreator(Class<?> clazz);
 
     protected abstract int getOrder(Class<?> clazz);
@@ -45,7 +47,6 @@ public abstract class DefinitionBuilder {
 
     protected abstract Method getInitMethod(Class<?> clazz);
 
-    protected abstract String getName(Class<?> clazz);
 
     protected abstract List<DependencyDescription> getDependencyDescriptions(Class<?> clazz);
 

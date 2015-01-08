@@ -1,6 +1,6 @@
 package cz.encircled.elight.context;
 
-import cz.encircled.elight.core.context.AnnotationContext;
+import cz.encircled.elight.core.context.AnnotationApplicationContext;
 import cz.encircled.elight.model.postprocess.ComponentToProcess;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +12,7 @@ public class ComponentPostProcessorTest {
 
     @Test
     public void basicPostProcessorTest() {
-        AnnotationContext context = new AnnotationContext("cz.encircled.elight.model.postprocess");
+        AnnotationApplicationContext context = new AnnotationApplicationContext("cz.encircled.elight.model.postprocess");
         ComponentToProcess component = context.getComponent(ComponentToProcess.class);
         Assert.assertNotNull(component);
         Assert.assertTrue(component.preProcessFlag);

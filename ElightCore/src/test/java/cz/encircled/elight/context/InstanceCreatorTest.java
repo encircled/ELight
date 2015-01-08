@@ -1,9 +1,7 @@
 package cz.encircled.elight.context;
 
-import cz.encircled.elight.core.context.AnnotationContext;
+import cz.encircled.elight.core.context.AnnotationApplicationContext;
 import cz.encircled.elight.model.creator.CreationTester;
-import cz.encircled.elight.model.house.Building;
-import cz.encircled.elight.model.house.House;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,11 +11,11 @@ import org.junit.Test;
  */
 public class InstanceCreatorTest {
 
-    private static AnnotationContext context;
+    private static AnnotationApplicationContext context;
 
     @BeforeClass
     public static void setupContext() {
-        context = new AnnotationContext("cz.encircled.elight.model.creator");
+        context = new AnnotationApplicationContext("cz.encircled.elight.model.creator");
     }
 
     @Test

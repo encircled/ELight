@@ -22,7 +22,7 @@ public interface ComponentFactory {
 
     boolean containsType(Class<?> clazz);
 
-    void addComponent(String name);
+    void addResolvedDependency(Object component, String name);
 
     void instantiateSingletons();
 

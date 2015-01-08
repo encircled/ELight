@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by encircled on 9/19/14.
  */
-public interface Context {
+public interface ApplicationContext {
 
     <T> T getComponent(Class<T> clazz);
 
@@ -16,6 +16,8 @@ public interface Context {
 
     boolean containsComponent(Class<?> clazz);
 
-    void addComponent(Object component);
+    void addResolvedDependency(Object component, String name);
+
+    void addResolvedDependency(Object component);
 
 }

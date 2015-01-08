@@ -5,9 +5,11 @@ import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.DependencyDescription;
 import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.core.exception.DuplicatedComponentException;
+import cz.encircled.elight.core.exception.RuntimeELightException;
 import cz.encircled.elight.core.exception.WiredMapGenericException;
 import cz.encircled.elight.core.util.CollectionUtil;
 import cz.encircled.elight.core.util.ReflectionUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,8 @@ public class DefaultComponentFactory implements ComponentFactory {
     private Map<Class<?>, String[]> typeToName = new ConcurrentHashMap<>(32);
 
     private Map<String, Object> singletonInstances = new HashMap<>(32);
+
+    private Map<String, Object> resolvedDependencies = new HashMap<>(32);
 
     private List<ComponentPostProcessor> componentPostProcessors = new ArrayList<>();
 
@@ -76,11 +80,12 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @Override
     public void registerDefinition(ComponentDefinition componentDefinition) {
-        log.debug("Register new definition for name {}", componentDefinition.name);
-        if (definitions.containsKey(componentDefinition.name)) {
-            throw new DuplicatedComponentException(componentDefinition.name);
+        String name = componentDefinition.name;
+        log.debug("Register new definition for name {}", name);
+        if (definitions.containsKey(name) || resolvedDependencies.containsKey(name)) {
+            throw new DuplicatedComponentException(name);
         }
-        definitions.put(componentDefinition.name, componentDefinition);
+        definitions.put(name, componentDefinition);
     }
 
     @Override
@@ -91,6 +96,10 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @Override
     public Object getComponent(String name) {
+        Object resolvedComponent = resolvedDependencies.get(name);
+        if(resolvedComponent != null) {
+            return resolvedComponent;
+        }
         ComponentDefinition definition = definitions.get(name);
         if (definition == null) {
             throw new ComponentNotFoundException(name);
@@ -119,6 +128,11 @@ public class DefaultComponentFactory implements ComponentFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getComponent(Class<T> type) {
+        for(Object candidate : resolvedDependencies.values()) {
+            if(type.isAssignableFrom(candidate.getClass())) {
+                return (T) candidate;
+            }
+        }
         for (ComponentDefinition definition : definitions.values()) {
             if (type.isAssignableFrom(definition.clazz)) {
                 return (T) getComponent(definition.name);
@@ -150,13 +164,19 @@ public class DefaultComponentFactory implements ComponentFactory {
         return false;
     }
 
-    public List<ComponentDefinition> getDefinitions(Class<?> type) {
-        return definitions.values().stream().filter(definition -> type.isAssignableFrom(definition.clazz)).collect(Collectors.toList());
+    @Override
+    public void addResolvedDependency(Object component, String name) {
+        if(StringUtils.isEmpty(name) || component == null) {
+            throw new RuntimeELightException("Illegal arguments");
+        }
+        if(definitions.containsKey(name) || resolvedDependencies.containsKey(name)) {
+            throw new DuplicatedComponentException(name);
+        }
+        resolvedDependencies.put(name, component);
     }
 
-    @Override
-    public void addComponent(String name) {
-        // TODO
+    public List<ComponentDefinition> getDefinitions(Class<?> type) {
+        return definitions.values().stream().filter(definition -> type.isAssignableFrom(definition.clazz)).collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
