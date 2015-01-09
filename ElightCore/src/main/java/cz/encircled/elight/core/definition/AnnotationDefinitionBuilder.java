@@ -53,7 +53,7 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
         for (Field field : fields) {
             Wired wired = field.getAnnotation(Wired.class);
             if (wired != null) {
-                result.add(new DependencyDescription(field, wired.isRequired()));
+                result.add(new DependencyDescription(field, wired.required()));
             }
         }
         return result;

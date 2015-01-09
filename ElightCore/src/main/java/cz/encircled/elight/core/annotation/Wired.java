@@ -14,6 +14,6 @@ public @interface Wired {
 
     String name() default "";
 
-    boolean isRequired() default true;
+    boolean required() default true;
 
 }
