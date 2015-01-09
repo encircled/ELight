@@ -25,12 +25,6 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
     }
 
     @Override
-    protected Class<? extends InstanceCreator> getComponentInstanceCreator(Class<?> clazz) {
-        Creator annotation = clazz.getAnnotation(Creator.class);
-        return annotation != null ? annotation.value() : null;
-    }
-
-    @Override
     protected int getOrder(Class<?> clazz) {
         Order annotation = clazz.getAnnotation(Order.class);
         return annotation != null ? annotation.value() : ContextConstants.DEFAULT_ORDER;
@@ -73,8 +67,8 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
 
     @Override
     protected Class<? extends InstanceCreator> getInstanceCreator(Class<?> clazz) {
-        Factory factoryAnnotation = clazz.getAnnotation(Factory.class);
-        return factoryAnnotation != null ? factoryAnnotation.value() : null;
+        Creator annotation = clazz.getAnnotation(Creator.class);
+        return annotation != null ? annotation.value() : null;
     }
 
 }

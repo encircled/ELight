@@ -20,9 +20,6 @@ public abstract class DefinitionBuilder {
     public ComponentDefinition buildDefinition(Class<?> clazz) {
         ComponentDefinition definition = new ComponentDefinition(clazz);
 
-        Class<? extends InstanceCreator> creator = getInstanceCreator(clazz);
-        if (creator != null)
-            definition.instanceCreator = creator;
 
         String scope = getScope(clazz);
         definition.isSingleton = scope == null || scope.equals(ComponentDefinition.SINGLETON);
@@ -32,14 +29,12 @@ public abstract class DefinitionBuilder {
         definition.destroyMethod = getDestroyMethod(clazz);
         definition.dependencies = getDependencyDescriptions(definition.clazz);
         definition.order = getOrder(definition.clazz);
-        definition.instanceCreator = getComponentInstanceCreator(definition.clazz);
+        definition.instanceCreator = getInstanceCreator(clazz);
 
         return definition;
     }
 
     public abstract String getName(Class<?> clazz);
-
-    protected abstract Class<? extends InstanceCreator> getComponentInstanceCreator(Class<?> clazz);
 
     protected abstract int getOrder(Class<?> clazz);
 
@@ -53,6 +48,5 @@ public abstract class DefinitionBuilder {
     protected abstract String getScope(Class<?> clazz);
 
     protected abstract Class<? extends InstanceCreator> getInstanceCreator(Class<?> clazz);
-
 
 }

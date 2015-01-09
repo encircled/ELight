@@ -8,7 +8,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Work on 1/7/2015.
+ * {@link InstanceCreator} can be specified, which will be used for component instantiating.
+ * @see InstanceCreator
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Encircled on 22-Dec-14.
+ * Order value is used for sorting, when wiring a list or array
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
