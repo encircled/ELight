@@ -152,6 +152,15 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     @Override
+    public <T> T getComponent(Class<T> type, boolean required) {
+        if(required) {
+            return getComponent(type);
+        } else {
+            return containsComponent(type) ? getComponent(type) : null;
+        }
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     @NotNull
     public <T> List<T> getComponents(Class<T> type) {
@@ -210,7 +219,7 @@ public class DefaultComponentFactory implements ComponentFactory {
         log.debug("Resolve dependency: field {} in bean {}", dependency.targetField.getName(), name);
         // TODO map, collections, exceptions, required
         Class<?> type = dependency.targetField.getType();
-        Object objToInject;
+        Object objToInject = null;
         if (Collection.class.isAssignableFrom(type)) {
             Class<Object> genericClass = ReflectionUtil.getGenericClasses(dependency.targetField)[0];
             Collection<Object> appropriateCollection = CollectionUtil.getAppropriateCollection((Class<? extends Collection<Object>>) type);
@@ -246,10 +255,13 @@ public class DefaultComponentFactory implements ComponentFactory {
             } else if (!componentsForKey.isEmpty() && componentsForValue.isEmpty()) {
                 objToInject = CollectionUtil.collectionToMap(getComponents(keyGenericClass), appropriateMap);
             } else {
-                throw new WiredMapGenericException();
+                if(dependency.isRequired)
+                    throw new WiredMapGenericException();
+                else
+                    objToInject = appropriateMap;
             }
         } else {
-            objToInject = getComponent(type);
+            objToInject = getComponent(type, false);
         }
         ReflectionUtil.setField(instance, dependency.targetField, objToInject);
     }

@@ -45,11 +45,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         return componentFactory.containsComponent(clazz);
     }
 
-    /**
-     * Add singleton <code>component</code> to context
-     *
-     * @param component - component instance
-     */
     @Override
     public void addResolvedDependency(Object component, String name) {
         if (StringUtils.isEmpty(name)) {

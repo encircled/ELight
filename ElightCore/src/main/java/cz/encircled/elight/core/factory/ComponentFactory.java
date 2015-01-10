@@ -18,6 +18,8 @@ public interface ComponentFactory {
 
     <T> T getComponent(Class<T> type);
 
+    <T> T getComponent(Class<T> type, boolean required);
+
     <T> List<T> getComponents(Class<T> type);
 
     boolean containsComponent(Class<?> clazz);

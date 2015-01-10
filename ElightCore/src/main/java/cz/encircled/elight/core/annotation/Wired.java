@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Encircled on 21-Dec-14.
+ * Indicates, that annotated field needs to be injected from application context.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -14,6 +14,6 @@ public @interface Wired {
 
     String name() default "";
 
-    boolean isRequired() default true;
+    boolean required() default true;
 
 }

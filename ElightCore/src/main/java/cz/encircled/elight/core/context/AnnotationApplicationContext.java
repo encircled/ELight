@@ -30,7 +30,7 @@ public class AnnotationApplicationContext extends AbstractApplicationContext imp
         log.debug("Annotation context initializing...");
 
         List<Class<?>> componentClasses = new ClasspathResourcesScanner(componentFactory).findComponentClasses(rootPackage);
-        componentClasses.parallelStream().forEach(c -> {
+        componentClasses.parallelStream().unordered().forEach(c -> {
             componentFactory.registerDefinition(definitionBuilder.buildDefinition(c));
         });
         startContext();

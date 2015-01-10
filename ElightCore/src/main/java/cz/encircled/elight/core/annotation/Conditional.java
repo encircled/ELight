@@ -8,7 +8,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Encircled on 22-Dec-14.
+ * Annotated component will be included to application context only if it's {@link ComponentCondition} returns true.
+ * @see ComponentCondition
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
