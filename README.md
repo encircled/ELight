@@ -6,10 +6,10 @@ Simple and lightweight IoC container
 Usage
 =======
 
-## Creating new context based on annotation configuration
+## New context based on annotation configuration
 new AnnotationApplicationContext("com.example.package").initialize();
 
-## Support features
+## Supported features
 - Injection via annotation (cz.encircled.elight.core.Wired)
 - Configurable order for collection injection (cz.encircled.elight.core.Order)
 - Conditional including in context (cz.encircled.elight.core.Conditional)
