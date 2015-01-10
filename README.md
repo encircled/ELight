@@ -15,6 +15,8 @@ new AnnotationApplicationContext("com.example.package").initialize();
 - Conditional including in context (cz.encircled.elight.core.Conditional)
 - Instance creating delegating to your custom factory (cz.encircled.elight.core.Creator)
 - Post/Pre processors for custom component configuration (cz.encircled.elight.core.ComponentPostProcessor)
+- PostConstruct/PreDestroy methods
+- Adding pre-resolved dependency to context
 
 ## JSR 330 support
 - @Inject
