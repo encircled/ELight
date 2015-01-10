@@ -14,6 +14,8 @@ public @interface Scope {
 
     public static final String PROTOTYPE = "prototype";
 
-    String value() default "singleton";
+    public static final String SINGLETON = "singleton";
+
+    String value() default SINGLETON;
 
 }

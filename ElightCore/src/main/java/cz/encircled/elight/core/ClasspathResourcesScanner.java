@@ -1,11 +1,9 @@
 package cz.encircled.elight.core;
 
-import cz.encircled.elight.core.annotation.Component;
-import cz.encircled.elight.core.annotation.Conditional;
+import cz.encircled.elight.core.definition.DefinitionBuilder;
 import cz.encircled.elight.core.exception.RuntimeELightException;
 import cz.encircled.elight.core.factory.ComponentFactory;
 import cz.encircled.elight.core.util.IOUtil;
-import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,8 +34,11 @@ public class ClasspathResourcesScanner {
 
     private ComponentFactory componentFactory;
 
-    public ClasspathResourcesScanner(ComponentFactory componentFactory) {
+    private DefinitionBuilder definitionBuilder;
+
+    public ClasspathResourcesScanner(ComponentFactory componentFactory, DefinitionBuilder definitionBuilder) {
         this.componentFactory = componentFactory;
+        this.definitionBuilder = definitionBuilder;
     }
 
     /**
@@ -75,10 +76,10 @@ public class ClasspathResourcesScanner {
                             - rootPackage.length() - 1).replaceAll("\\\\", ".");
                     className = IOUtil.getFileNameWithoutType(className);
                     Class candidateClass = Class.forName(className);
-                    if (isPostProcessor(candidateClass)) {
+                    if (definitionBuilder.isPostProcessor(candidateClass)) {
                         componentFactory.registerPostProcessor(candidateClass);
                     }
-                    if (checkCandidate(candidateClass)) {
+                    if (definitionBuilder.checkCandidate(candidateClass)) {
                         log.debug("New resource annotated class {}", candidateClass.getName());
                         result.add(candidateClass);
                     }
@@ -106,28 +107,15 @@ public class ClasspathResourcesScanner {
             if (jarEntry.getName().startsWith(rootPackage) && jarEntry.getName().endsWith(".class")) {
                 String className = jarEntry.getName().replace("/", ".").substring(0, jarEntry.getName().length() - 6);
                 Class candidateClass = Class.forName(className);
-                if (isPostProcessor(candidateClass)) {
+                if (definitionBuilder.isPostProcessor(candidateClass)) {
                     componentFactory.registerPostProcessor(candidateClass);
                 }
-                if (checkCandidate(candidateClass)) {
+                if (definitionBuilder.checkCandidate(candidateClass)) {
                     log.debug("New component annotated class {}", candidateClass.getName());
                     result.add(candidateClass);
                 }
             }
         }
-    }
-
-    private boolean isPostProcessor(Class candidateClass) {
-        return ComponentPostProcessor.class.isAssignableFrom(candidateClass) && ReflectionUtil.isConcrete(candidateClass);
-    }
-
-    private boolean checkCandidate(Class<?> clazz) {
-        return clazz.getAnnotation(Component.class) != null && ReflectionUtil.isConcrete(clazz) && checkCondition(clazz);
-    }
-
-    private boolean checkCondition(Class<?> clazz) {
-        Conditional conditional = clazz.getAnnotation(Conditional.class);
-        return conditional == null || ReflectionUtil.instance(conditional.value()).addToContext(clazz);
     }
 
     private boolean isJar(String protocol) {

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ComponentUtil {
 
-    public static String getName(Class<?> clazz) {
+    public static String getDefaultName(Class<?> clazz) {
         return StringUtils.uncapitalize(clazz.getSimpleName());
     }
 

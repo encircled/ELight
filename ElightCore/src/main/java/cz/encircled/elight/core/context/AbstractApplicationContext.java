@@ -1,7 +1,7 @@
 package cz.encircled.elight.core.context;
 
+import cz.encircled.elight.core.definition.AbstractDefinitionBuilder;
 import cz.encircled.elight.core.definition.AnnotationDefinitionBuilder;
-import cz.encircled.elight.core.definition.DefinitionBuilder;
 import cz.encircled.elight.core.factory.ComponentFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +15,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     private static final Logger log = LogManager.getLogger();
 
-    protected DefinitionBuilder definitionBuilder;
+    protected AbstractDefinitionBuilder definitionBuilder;
 
     protected ComponentFactory componentFactory;
 

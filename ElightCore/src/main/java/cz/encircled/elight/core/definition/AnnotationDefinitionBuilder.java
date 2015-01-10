@@ -1,5 +1,6 @@
 package cz.encircled.elight.core.definition;
 
+import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.DependencyDescription;
 import cz.encircled.elight.core.annotation.*;
 import cz.encircled.elight.core.context.ContextConstants;
@@ -10,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ import java.util.List;
 /**
  * Created by Encircled on 20-Dec-14.
  */
-public class AnnotationDefinitionBuilder extends DefinitionBuilder {
+public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
 
     public AnnotationDefinitionBuilder() {
 
@@ -41,9 +44,26 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
     }
 
     @Override
+    public boolean checkCandidate(Class<?> clazz) {
+        boolean isAnnotated = clazz.getAnnotation(Component.class) != null || clazz.getAnnotation(Singleton.class) != null;
+        return isAnnotated && ReflectionUtil.isConcrete(clazz) && isConditionTrue(clazz);
+    }
+
+    @Override
+    public boolean isPostProcessor(Class<?> clazz) {
+        return ComponentPostProcessor.class.isAssignableFrom(clazz) && ReflectionUtil.isConcrete(clazz);
+    }
+
+    @Override
+    public boolean isConditionTrue(Class<?> clazz) {
+        Conditional conditional = clazz.getAnnotation(Conditional.class);
+        return conditional == null || ReflectionUtil.instance(conditional.value()).addToContext(clazz);
+    }
+
+    @Override
     public String getName(Class<?> clazz) {
         Component annotation = clazz.getAnnotation(Component.class);
-        return annotation == null || StringUtils.isEmpty(annotation.value()) ? ComponentUtil.getName(clazz) : annotation.value();
+        return annotation == null || StringUtils.isEmpty(annotation.value()) ? ComponentUtil.getDefaultName(clazz) : annotation.value();
     }
 
     @Override
@@ -54,6 +74,11 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
             Wired wired = field.getAnnotation(Wired.class);
             if (wired != null) {
                 result.add(new DependencyDescription(field, wired.required()));
+            } else {
+                Inject inject = field.getAnnotation(Inject.class);
+                if (inject != null) {
+                    result.add(new DependencyDescription(field, true));
+                }
             }
         }
         return result;
@@ -62,7 +87,13 @@ public class AnnotationDefinitionBuilder extends DefinitionBuilder {
     @Override
     protected String getScope(Class<?> clazz) {
         Scope scope = clazz.getAnnotation(Scope.class);
-        return scope != null ? scope.value() : null;
+        if (scope != null) {
+            return scope.value();
+        }
+        if (clazz.getAnnotation(Singleton.class) != null) {
+            return Scope.PROTOTYPE;
+        }
+        return null;
     }
 
     @Override

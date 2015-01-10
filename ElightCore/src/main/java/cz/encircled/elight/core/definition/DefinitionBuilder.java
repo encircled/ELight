@@ -1,52 +1,24 @@
 package cz.encircled.elight.core.definition;
 
-import cz.encircled.elight.core.ComponentDefinition;
-import cz.encircled.elight.core.DependencyDescription;
-import cz.encircled.elight.core.creator.InstanceCreator;
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Method;
-import java.util.List;
-
 /**
- * Created by encircled on 9/19/14.
+ * Created by Encircled on 10-Jan-15.
  */
-public abstract class DefinitionBuilder {
+public interface DefinitionBuilder {
 
-    public DefinitionBuilder() {
-    }
+    /**
+     * @param clazz - candidate class
+     * @return <b>true</b> - if assigned <code>class</code> have to be managed by context
+     */
+    boolean checkCandidate(Class<?> clazz);
 
-    @NotNull
-    public ComponentDefinition buildDefinition(Class<?> clazz) {
-        ComponentDefinition definition = new ComponentDefinition(clazz);
+    String getName(Class<?> clazz);
 
+    boolean isPostProcessor(Class<?> clazz);
 
-        String scope = getScope(clazz);
-        definition.isSingleton = scope == null || scope.equals(ComponentDefinition.SINGLETON);
-
-        definition.name = getName(clazz);
-        definition.initMethod = getInitMethod(clazz);
-        definition.destroyMethod = getDestroyMethod(clazz);
-        definition.dependencies = getDependencyDescriptions(definition.clazz);
-        definition.order = getOrder(definition.clazz);
-        definition.instanceCreator = getInstanceCreator(clazz);
-
-        return definition;
-    }
-
-    public abstract String getName(Class<?> clazz);
-
-    protected abstract int getOrder(Class<?> clazz);
-
-    protected abstract Method getDestroyMethod(Class<?> clazz);
-
-    protected abstract Method getInitMethod(Class<?> clazz);
-
-
-    protected abstract List<DependencyDescription> getDependencyDescriptions(Class<?> clazz);
-
-    protected abstract String getScope(Class<?> clazz);
-
-    protected abstract Class<? extends InstanceCreator> getInstanceCreator(Class<?> clazz);
+    /**
+     * @param clazz - candidate class
+     * @return <b>true</b> - if candidate has no condition, or it has passed the condition
+     */
+    boolean isConditionTrue(Class<?> clazz);
 
 }

@@ -1,6 +1,7 @@
 package cz.encircled.elight.web;
 
-import cz.encircled.elight.core.context.AnnotationContext;
+import cz.encircled.elight.core.context.AnnotationApplicationContext;
+import cz.encircled.elight.core.context.ApplicationContext;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -17,7 +18,7 @@ public class ELightELResolver extends ELResolver {
         if (base != null) {
             return null;
         }
-        AnnotationContext context1 = new AnnotationContext("cz.encircled.elight.web");
+        ApplicationContext context1 = new AnnotationApplicationContext("cz.encircled.elight.web").initialize();
         if (context1.containsComponent(property.toString())) {
             context.setPropertyResolved(true);
             return context1.getComponent(property.toString());
