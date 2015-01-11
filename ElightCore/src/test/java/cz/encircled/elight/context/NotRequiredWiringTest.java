@@ -1,7 +1,5 @@
 package cz.encircled.elight.context;
 
-import cz.encircled.elight.core.context.AnnotationApplicationContext;
-import cz.encircled.elight.core.context.ApplicationContext;
 import cz.encircled.elight.model.required.ComponentRequiredObjectTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,12 +7,15 @@ import org.junit.Test;
 /**
  * Created by Kisel on 1/9/2015.
  */
-public class NotRequiredWiringTest {
+public class NotRequiredWiringTest extends AbstractContextTest {
+
+    public NotRequiredWiringTest() {
+        super("cz.encircled.elight.model.required");
+    }
 
     @Test
     public void notRequiredWiringTest() {
-        ApplicationContext context = new AnnotationApplicationContext("cz.encircled.elight.model.required").initialize();
-        ComponentRequiredObjectTest component = context.getComponent(ComponentRequiredObjectTest.class);
+        ComponentRequiredObjectTest component = applicationContext.getComponent(ComponentRequiredObjectTest.class);
 
         Assert.assertNotNull(component);
         Assert.assertNull(component.resolvedObject);

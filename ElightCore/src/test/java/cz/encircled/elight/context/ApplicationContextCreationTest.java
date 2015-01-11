@@ -1,7 +1,6 @@
 package cz.encircled.elight.context;
 
 import cz.encircled.elight.core.annotation.Order;
-import cz.encircled.elight.core.context.AnnotationApplicationContext;
 import cz.encircled.elight.core.context.ApplicationContext;
 import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.model.condition.FalseConditionComponent;
@@ -10,7 +9,6 @@ import cz.encircled.elight.model.house.Building;
 import cz.encircled.elight.model.house.House;
 import cz.encircled.elight.model.house.Window;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
@@ -18,21 +16,14 @@ import java.util.Map;
 /**
  * Created by Encircled on 22-Dec-14.
  */
-public class ApplicationContextCreationTest {
-
-    private static ApplicationContext context;
-
-    @BeforeClass
-    public static void setupContext() {
-        context = new AnnotationApplicationContext("cz.encircled.elight").initialize();
-    }
+public class ApplicationContextCreationTest extends AbstractContextTest {
 
     @Test
     public void basicComponentsTest() {
-        Object testComponentObj = context.getComponent("house");
-        Object doorCustomName = context.getComponent("mainDoor");
-        House house = context.getComponent(House.class);
-        Building testComponentInt = context.getComponent(Building.class);
+        Object testComponentObj = applicationContext.getComponent("house");
+        Object doorCustomName = applicationContext.getComponent("mainDoor");
+        House house = applicationContext.getComponent(House.class);
+        Building testComponentInt = applicationContext.getComponent(Building.class);
 
         Assert.assertNotNull(doorCustomName);
         Assert.assertNotNull(testComponentObj);
@@ -45,7 +36,7 @@ public class ApplicationContextCreationTest {
 
     @Test
     public void mapsTest() {
-        House house = context.getComponent(House.class);
+        House house = applicationContext.getComponent(House.class);
         Map<Window, String> windowAsKeyMap = house.getWindowAsKeyMap();
         Assert.assertNotNull(windowAsKeyMap);
         Assert.assertTrue(windowAsKeyMap.size() > 0);
@@ -57,7 +48,7 @@ public class ApplicationContextCreationTest {
 
     @Test
     public void collectionsWithOrderTest() {
-        House house = context.getComponent(House.class);
+        House house = applicationContext.getComponent(House.class);
         Assert.assertNotNull(house.getWindows());
         for (int i = 0; i < house.getWindows().size(); i++) {
             Window window = house.getWindows().get(i);
@@ -68,34 +59,34 @@ public class ApplicationContextCreationTest {
 
     @Test(expected = ComponentNotFoundException.class)
     public void conditionalTest() {
-        TrueConditionComponent trueCondition = context.getComponent(TrueConditionComponent.class);
+        TrueConditionComponent trueCondition = applicationContext.getComponent(TrueConditionComponent.class);
         Assert.assertNotNull(trueCondition);
-        context.getComponent(FalseConditionComponent.class);
+        applicationContext.getComponent(FalseConditionComponent.class);
     }
 
     @Test(expected = ComponentNotFoundException.class)
     public void conditionalByNameTest() {
-        TrueConditionComponent trueCondition = (TrueConditionComponent) context.getComponent("trueConditionComponent");
+        TrueConditionComponent trueCondition = (TrueConditionComponent) applicationContext.getComponent("trueConditionComponent");
         Assert.assertNotNull(trueCondition);
-        context.getComponent("falseConditionComponent");
+        applicationContext.getComponent("falseConditionComponent");
     }
 
     @Test
     public void arrayTest() {
-        House house = context.getComponent(House.class);
+        House house = applicationContext.getComponent(House.class);
         Assert.assertNotNull(house.getWindowsArray());
         Assert.assertTrue(house.getWindowsArray().length > 0);
     }
 
     @Test
     public void containsComponentTest() {
-        Assert.assertTrue(context.containsComponent(ApplicationContext.class));
-        Assert.assertTrue(context.containsComponent("applicationContext"));
+        Assert.assertTrue(applicationContext.containsComponent(ApplicationContext.class));
+        Assert.assertTrue(applicationContext.containsComponent("applicationContext"));
 
-        Assert.assertTrue(context.containsComponent("house"));
+        Assert.assertTrue(applicationContext.containsComponent("house"));
 
-        Assert.assertFalse(context.containsComponent("notExistingComponent"));
-        Assert.assertFalse(context.containsComponent(this.getClass()));
+        Assert.assertFalse(applicationContext.containsComponent("notExistingComponent"));
+        Assert.assertFalse(applicationContext.containsComponent(this.getClass()));
     }
 
 }

@@ -3,16 +3,34 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ELight</artifactId>
+        <artifactId>elight</artifactId>
         <groupId>cz.encircled</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- More Project Information -->
+    <name>elight-core</name>
+    <developers>
+        <developer>
+            <email>eencircled@gmail.com</email>
+        </developer>
+    </developers>
+
     <artifactId>elight-core</artifactId>
 
-    <build>
+    <distributionManagement>
+        <repository>
+            <id>repo</id>
+            <url>https://github.com/encircled/mvn-repo/raw/master</url>
+        </repository>
+        <snapshotRepository>
+            <id>repo2</id>
+            <url>https://github.com/encircled/mvn-repo/raw/master</url>
+        </snapshotRepository>
+    </distributionManagement>
 
+    <build>
         <plugins>
 
             <plugin>
@@ -32,7 +50,30 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
     </build>

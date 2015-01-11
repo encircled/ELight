@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -63,7 +64,12 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
     @Override
     public String getName(Class<?> clazz) {
         Component annotation = clazz.getAnnotation(Component.class);
-        return annotation == null || StringUtils.isEmpty(annotation.value()) ? ComponentUtil.getDefaultName(clazz) : annotation.value();
+        Named namedAnnotation = clazz.getAnnotation(Named.class);
+        if (annotation != null && StringUtils.isNotEmpty(annotation.value())) {
+            return annotation.value();
+        }
+        return namedAnnotation == null || StringUtils.isEmpty(namedAnnotation.value()) ?
+                ComponentUtil.getDefaultName(clazz) : namedAnnotation.value();
     }
 
     @Override
@@ -71,13 +77,16 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
         List<DependencyDescription> result = new ArrayList<>();
         List<Field> fields = ReflectionUtil.getAllFields(clazz);
         for (Field field : fields) {
+            Named namedAnnotation = field.getAnnotation(Named.class);
+            String named = namedAnnotation == null ? null : namedAnnotation.value();
             Wired wired = field.getAnnotation(Wired.class);
             if (wired != null) {
-                result.add(new DependencyDescription(field, wired.required()));
+                String finalName = StringUtils.isEmpty(named) ? wired.name() : named;
+                result.add(new DependencyDescription(field, wired.required(), finalName));
             } else {
                 Inject inject = field.getAnnotation(Inject.class);
                 if (inject != null) {
-                    result.add(new DependencyDescription(field, true));
+                    result.add(new DependencyDescription(field, true, named));
                 }
             }
         }

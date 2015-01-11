@@ -21,3 +21,4 @@ new AnnotationApplicationContext("com.example.package").initialize();
 ## JSR 330 support
 - @Inject
 - @Singleton
+- @Named

@@ -15,6 +15,9 @@ public class TestPostProcessor implements ComponentPostProcessor {
         if (component instanceof ComponentToProcess) {
             ((ComponentToProcess) component).preProcessFlag = true;
         }
+        if (component instanceof PrototypeComponentToProcess) {
+            ((PrototypeComponentToProcess) component).preProcessFlag = true;
+        }
         return component;
     }
 
@@ -22,6 +25,9 @@ public class TestPostProcessor implements ComponentPostProcessor {
     public Object postProcess(Object component) {
         if (component instanceof ComponentToProcess) {
             ((ComponentToProcess) component).postProcessFlag = true;
+        }
+        if (component instanceof PrototypeComponentToProcess) {
+            ((PrototypeComponentToProcess) component).postProcessFlag = true;
         }
         return component;
     }

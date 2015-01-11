@@ -2,6 +2,7 @@ package cz.encircled.elight.core.context;
 
 /**
  * Created by encircled on 9/19/14.
+ * TODO circular reference (component name - self reference)
  */
 public interface ApplicationContext {
 

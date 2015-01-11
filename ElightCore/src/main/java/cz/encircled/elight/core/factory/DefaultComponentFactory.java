@@ -3,10 +3,7 @@ package cz.encircled.elight.core.factory;
 import cz.encircled.elight.core.ComponentDefinition;
 import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.DependencyDescription;
-import cz.encircled.elight.core.exception.ComponentNotFoundException;
-import cz.encircled.elight.core.exception.DuplicatedComponentException;
-import cz.encircled.elight.core.exception.RuntimeELightException;
-import cz.encircled.elight.core.exception.WiredMapGenericException;
+import cz.encircled.elight.core.exception.*;
 import cz.encircled.elight.core.util.CollectionUtil;
 import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -121,6 +118,15 @@ public class DefaultComponentFactory implements ComponentFactory {
         }
     }
 
+    @Override
+    public Object getComponent(String name, boolean required) {
+        if (required) {
+            return getComponent(name);
+        } else {
+            return containsComponent(name) ? getComponent(name) : null;
+        }
+    }
+
     private Object getInitializedPrototypeComponent(ComponentDefinition definition) {
         Object instance = instantiateComponent(definition);
         definition.dependencies.forEach(dependency -> {
@@ -138,17 +144,15 @@ public class DefaultComponentFactory implements ComponentFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getComponent(Class<T> type) {
-        for (Object candidate : resolvedDependencies.values()) {
-            if (type.isAssignableFrom(candidate.getClass())) {
-                return (T) candidate;
-            }
+        List<T> components = getComponents(type);
+        switch (components.size()) {
+            case 0:
+                throw new ComponentNotFoundException(type);
+            case 1:
+                return components.get(0);
+            default:
+                throw new AmbiguousDependencyException(type);
         }
-        for (ComponentDefinition definition : definitions.values()) {
-            if (type.isAssignableFrom(definition.clazz)) {
-                return (T) getComponent(definition.name);
-            }
-        }
-        throw new ComponentNotFoundException(type);
     }
 
     @Override
@@ -172,7 +176,7 @@ public class DefaultComponentFactory implements ComponentFactory {
         }
         for (ComponentDefinition definition : definitions.values()) {
             if (type.isAssignableFrom(definition.clazz)) {
-                components.add((T) singletonInstances.get(definition.name));
+                components.add((T) getComponent(definition.name));
             }
         }
         return components;
@@ -216,7 +220,7 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @SuppressWarnings("unchecked")
     private void resolveDependency(String name, Object instance, DependencyDescription dependency) {
-        log.debug("Resolve dependency: field {} in bean {}", dependency.targetField.getName(), name);
+        log.debug("Resolve dependency: field {} in component with name {}", dependency.targetField.getName(), name);
         // TODO map, collections, exceptions, required
         Class<?> type = dependency.targetField.getType();
         Object objToInject = null;
@@ -261,7 +265,11 @@ public class DefaultComponentFactory implements ComponentFactory {
                     objToInject = appropriateMap;
             }
         } else {
-            objToInject = getComponent(type, false);
+            if (dependency.hasNameQualifier()) {
+                objToInject = getComponent(dependency.nameQualifier, dependency.isRequired);
+            } else {
+                objToInject = getComponent(type, dependency.isRequired);
+            }
         }
         ReflectionUtil.setField(instance, dependency.targetField, objToInject);
     }

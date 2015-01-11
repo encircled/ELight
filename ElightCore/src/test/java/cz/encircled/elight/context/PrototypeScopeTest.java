@@ -1,7 +1,5 @@
 package cz.encircled.elight.context;
 
-import cz.encircled.elight.core.context.AnnotationApplicationContext;
-import cz.encircled.elight.core.context.ApplicationContext;
 import cz.encircled.elight.model.prototype.PrototypeComponentWithTime;
 import cz.encircled.elight.model.prototype.SingletonWithPrototypeWiring;
 import org.junit.Assert;
@@ -10,15 +8,18 @@ import org.junit.Test;
 /**
  * Created by Encircled on 24-Dec-14.
  */
-public class PrototypeScopeTest {
+public class PrototypeScopeTest extends AbstractContextTest {
+
+    public PrototypeScopeTest() {
+        super("cz.encircled.elight.model.prototype");
+    }
 
     @Test
     public void basicPrototypeTest() {
-        ApplicationContext context = new AnnotationApplicationContext("cz.encircled.elight.model.prototype").initialize();
-        PrototypeComponentWithTime component1 = context.getComponent(PrototypeComponentWithTime.class);
-        PrototypeComponentWithTime component2 = (PrototypeComponentWithTime) context.getComponent("prototypeComponentWithTime");
+        PrototypeComponentWithTime component1 = applicationContext.getComponent(PrototypeComponentWithTime.class);
+        PrototypeComponentWithTime component2 = (PrototypeComponentWithTime) applicationContext.getComponent("prototypeComponentWithTime");
 
-        SingletonWithPrototypeWiring singleton = context.getComponent(SingletonWithPrototypeWiring.class);
+        SingletonWithPrototypeWiring singleton = applicationContext.getComponent(SingletonWithPrototypeWiring.class);
 
         Assert.assertNotNull(singleton);
         Assert.assertNotNull(singleton.prototypeComponentWithTime);

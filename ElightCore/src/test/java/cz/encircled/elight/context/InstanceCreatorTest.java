@@ -1,27 +1,21 @@
 package cz.encircled.elight.context;
 
-import cz.encircled.elight.core.context.AnnotationApplicationContext;
-import cz.encircled.elight.core.context.ApplicationContext;
 import cz.encircled.elight.model.creator.CreationTester;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * Created by Work on 1/7/2015.
  */
-public class InstanceCreatorTest {
+public class InstanceCreatorTest extends AbstractContextTest {
 
-    private static ApplicationContext context;
-
-    @BeforeClass
-    public static void setupContext() {
-        context = new AnnotationApplicationContext("cz.encircled.elight.model.creator").initialize();
+    public InstanceCreatorTest() {
+        super("cz.encircled.elight.model.creator");
     }
 
     @Test
     public void basicComponentsTest() {
-        CreationTester tester = context.getComponent(CreationTester.class);
+        CreationTester tester = applicationContext.getComponent(CreationTester.class);
 
         Assert.assertNotNull(tester);
         Assert.assertTrue(tester.createTestFlag);
