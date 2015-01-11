@@ -16,6 +16,8 @@ public class ComponentDefinition {
 
     public String name;
 
+    public Object qualifier;
+
     public Class<?> clazz;
 
     public boolean isSingleton;
@@ -48,7 +50,15 @@ public class ComponentDefinition {
     public String toString() {
         return "ComponentDefinition{" +
                 "name='" + name + '\'' +
+                ", qualifier=" + qualifier +
                 ", clazz=" + clazz +
+                ", isSingleton=" + isSingleton +
+                ", isWireAllowed=" + isWireAllowed +
+                ", order=" + order +
+                ", dependencies=" + dependencies +
+                ", instanceCreator=" + instanceCreator +
+                ", initMethod=" + initMethod +
+                ", destroyMethod=" + destroyMethod +
                 '}';
     }
 }

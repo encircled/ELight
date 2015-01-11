@@ -22,3 +22,4 @@ new AnnotationApplicationContext("com.example.package").initialize();
 - @Inject
 - @Singleton
 - @Named
+- @Qualifier

@@ -20,4 +20,8 @@ public class ComponentNotFoundException extends RuntimeELightException {
         super("Component not found for classes " + CollectionUtil.stringify(classes));
     }
 
+    public ComponentNotFoundException(Class<?> clazz, Object qualifier) {
+        super("Component not found for class " + clazz.getName() + " and qualifier " + qualifier);
+    }
+
 }

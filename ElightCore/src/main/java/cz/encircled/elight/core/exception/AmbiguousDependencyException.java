@@ -9,4 +9,9 @@ public class AmbiguousDependencyException extends RuntimeELightException {
         super("Ambiguous dependency for class: " + clazz.getName() + ". You can use qualifiers to specify concrete component.");
     }
 
+    public AmbiguousDependencyException(Class<?> clazz, Object qualifier) {
+        super("Ambiguous dependency for class: " + clazz.getName() + " and qualifier " + qualifier +
+                ". You can use qualifiers to specify concrete component.");
+    }
+
 }

@@ -17,15 +17,11 @@ public class DependencyDescription {
 
     public Object qualifier;
 
-    public DependencyDescription(Field targetField, boolean isRequired) {
-        this.targetField = targetField;
-        this.isRequired = isRequired;
-    }
-
-    public DependencyDescription(Field targetField, boolean isRequired, String nameQualifier) {
+    public DependencyDescription(Field targetField, boolean isRequired, String nameQualifier, Object qualifier) {
         this.targetField = targetField;
         this.isRequired = isRequired;
         this.nameQualifier = nameQualifier;
+        this.qualifier = qualifier;
     }
 
     public boolean hasNameQualifier() {

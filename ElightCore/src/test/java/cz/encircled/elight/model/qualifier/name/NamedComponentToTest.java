@@ -7,4 +7,6 @@ import cz.encircled.elight.core.annotation.Component;
  */
 @Component("customComponentName")
 public class NamedComponentToTest implements TestNamedInterface {
+
+
 }
