@@ -9,7 +9,6 @@ import cz.encircled.elight.core.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -166,7 +165,6 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @Override
     @SuppressWarnings("unchecked")
-    @NotNull
     public <T> List<T> getComponents(Class<T> type) {
         List<T> components = new ArrayList<>();
         for (Object candidate : resolvedDependencies.values()) {

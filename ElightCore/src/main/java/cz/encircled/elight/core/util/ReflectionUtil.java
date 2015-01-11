@@ -1,7 +1,6 @@
 package cz.encircled.elight.core.util;
 
 import cz.encircled.elight.core.exception.RuntimeELightException;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -25,7 +24,6 @@ public class ReflectionUtil {
         return null;
     }
 
-    @NotNull
     public static <T> T instance(Class<T> clazz) {
         try {
             return clazz.newInstance();
@@ -90,7 +88,6 @@ public class ReflectionUtil {
         }
     }
 
-    @NotNull
     public static Set<Class<?>> getSuperClasses(Class<?> clazz) {
         HashSet<Class<?>> collected = new HashSet<>();
         while (clazz.getSuperclass() != Object.class) {

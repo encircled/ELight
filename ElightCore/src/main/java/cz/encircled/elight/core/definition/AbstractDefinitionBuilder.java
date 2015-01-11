@@ -3,7 +3,6 @@ package cz.encircled.elight.core.definition;
 import cz.encircled.elight.core.ComponentDefinition;
 import cz.encircled.elight.core.DependencyDescription;
 import cz.encircled.elight.core.creator.InstanceCreator;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -16,7 +15,6 @@ public abstract class AbstractDefinitionBuilder implements DefinitionBuilder {
     public AbstractDefinitionBuilder() {
     }
 
-    @NotNull
     public ComponentDefinition buildDefinition(Class<?> clazz) {
         ComponentDefinition definition = new ComponentDefinition(clazz);
 
