@@ -265,8 +265,8 @@ public class DefaultComponentFactory implements ComponentFactory {
         } else {
             if (dependency.hasNameQualifier()) {
                 objToInject = getComponent(dependency.nameQualifier, dependency.isRequired);
-            } else if (dependency.qualifier != null) {
-                objToInject = getComponentByQualifier(type, dependency.qualifier, dependency.isRequired);
+            } else if (dependency.qualifiers != null) {
+                objToInject = getComponentByQualifier(type, dependency.qualifiers, dependency.isRequired);
             } else {
                 objToInject = getComponent(type, dependency.isRequired);
             }
@@ -274,17 +274,17 @@ public class DefaultComponentFactory implements ComponentFactory {
         ReflectionUtil.setField(instance, dependency.targetField, objToInject);
     }
 
-    private Object getComponentByQualifier(Class<?> type, Object qualifier, boolean isRequired) {
+    private Object getComponentByQualifier(Class<?> type, Object[] qualifiers, boolean isRequired) {
         List<ComponentDefinition> found = definitions.values().stream().unordered().filter(definition -> {
-            return type.isAssignableFrom(definition.clazz) && qualifier.equals(definition.qualifier);
+            return type.isAssignableFrom(definition.clazz) && Arrays.equals(qualifiers, definition.qualifiers);
         }).collect(Collectors.toList());
         if (found.size() == 0) {
             if (isRequired)
-                throw new ComponentNotFoundException(type, qualifier);
+                throw new ComponentNotFoundException(type, qualifiers);
             return null;
         }
         if (found.size() > 1) {
-            throw new AmbiguousDependencyException(type, qualifier);
+            throw new AmbiguousDependencyException(type, qualifiers);
         }
         return getComponent(found.get(0).name);
     }

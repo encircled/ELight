@@ -16,7 +16,7 @@ public class ComponentDefinition {
 
     public String name;
 
-    public Object qualifier;
+    public Object[] qualifiers;
 
     public Class<?> clazz;
 
@@ -50,7 +50,7 @@ public class ComponentDefinition {
     public String toString() {
         return "ComponentDefinition{" +
                 "name='" + name + '\'' +
-                ", qualifier=" + qualifier +
+                ", qualifiers=" + qualifiers +
                 ", clazz=" + clazz +
                 ", isSingleton=" + isSingleton +
                 ", isWireAllowed=" + isWireAllowed +

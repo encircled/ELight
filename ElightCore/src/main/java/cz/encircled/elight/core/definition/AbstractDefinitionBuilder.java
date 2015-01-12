@@ -23,7 +23,7 @@ public abstract class AbstractDefinitionBuilder implements DefinitionBuilder {
         definition.isSingleton = scope == null || scope.equals(ComponentDefinition.SINGLETON);
 
         definition.name = getName(clazz);
-        definition.qualifier = getQualifier(clazz);
+        definition.qualifiers = getQualifiers(clazz);
         definition.initMethod = getInitMethod(clazz);
         definition.destroyMethod = getDestroyMethod(clazz);
         definition.dependencies = getDependencyDescriptions(definition.clazz);
@@ -33,7 +33,7 @@ public abstract class AbstractDefinitionBuilder implements DefinitionBuilder {
         return definition;
     }
 
-    protected abstract Object getQualifier(Class<?> clazz);
+    protected abstract Object[] getQualifiers(Class<?> clazz);
 
     protected abstract int getOrder(Class<?> clazz);
 

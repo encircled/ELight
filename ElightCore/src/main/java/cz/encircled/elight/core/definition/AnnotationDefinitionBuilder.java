@@ -28,8 +28,8 @@ import java.util.List;
 public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
 
     @Override
-    protected Object getQualifier(Class<?> clazz) {
-        return findQualifier(clazz.getAnnotations());
+    protected Object[] getQualifiers(Class<?> clazz) {
+        return findQualifiers(clazz.getAnnotations());
     }
 
     @Override
@@ -83,15 +83,15 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
         for (Field field : fields) {
             Wired wired = field.getAnnotation(Wired.class);
             if (wired != null) {
-                Object qualifier = findQualifier(field.getAnnotations());
+                Object[] qualifiers = findQualifiers(field.getAnnotations());
                 String named = getValueFromNamedAnnotation(field);
                 String finalName = StringUtils.isEmpty(named) ? wired.name() : named;
-                result.add(new DependencyDescription(field, wired.required(), finalName, qualifier));
+                result.add(new DependencyDescription(field, wired.required(), finalName, qualifiers));
             } else {
                 Inject inject = field.getAnnotation(Inject.class);
                 if (inject != null) {
-                    Object qualifier = findQualifier(field.getAnnotations());
-                    result.add(new DependencyDescription(field, true, getValueFromNamedAnnotation(field), qualifier));
+                    Object[] qualifiers = findQualifiers(field.getAnnotations());
+                    result.add(new DependencyDescription(field, true, getValueFromNamedAnnotation(field), qualifiers));
                 }
             }
         }
@@ -121,8 +121,8 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
         return namedAnnotation == null ? null : namedAnnotation.value();
     }
 
-    private Object findQualifier(Annotation[] annotations) {
-        Object value = null;
+    private Object[] findQualifiers(Annotation[] annotations) {
+        List<Object> qualifiers = new ArrayList<>(2);
         for (Annotation fieldAnnotation : annotations) {
             if (fieldAnnotation.annotationType().isAnnotationPresent(Qualifier.class)) {
                 Method[] methods = fieldAnnotation.annotationType().getDeclaredMethods();
@@ -130,11 +130,12 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                     throw new RuntimeELightException("Qualifier annotation must have one method - " +
                             fieldAnnotation.getClass().toString());
                 }
-                value = ReflectionUtil.invokeMethod(methods[0], fieldAnnotation);
-                break;
+                Object value = ReflectionUtil.invokeMethod(methods[0], fieldAnnotation);
+                if(value != null)
+                    qualifiers.add(value);
             }
         }
-        return value;
+        return qualifiers.toArray();
     }
 
 }

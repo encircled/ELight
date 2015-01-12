@@ -22,6 +22,10 @@ public class CustomQualifierWiring {
     @TestCustomQualifier
     private CustomQualifierInterface white;
 
+    @Inject
+    @TestCustomQualifier(color = TestCustomQualifier.Color.BLACK)
+    @AnotherTestCustomQualifier(anotherColor = AnotherTestCustomQualifier.AnotherColor.WHITE)
+    private BlackAndWhiteCustomQualifier blackAndWhite;
 
     public CustomQualifierInterface getRed() {
         return red;
@@ -35,4 +39,7 @@ public class CustomQualifierWiring {
         return white;
     }
 
+    public BlackAndWhiteCustomQualifier getBlackAndWhite() {
+        return blackAndWhite;
+    }
 }
