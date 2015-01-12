@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates, that annotated field needs to be injected from application context.
  */
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Wired {
 

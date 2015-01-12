@@ -32,18 +32,18 @@ public class ReflectionUtil {
         }
     }
 
-    public static Object invokeMethod(Method method, Object instance) {
+    public static Object invokeMethod(Object instance, Method method, Object... params) {
         try {
             method.setAccessible(true);
-            return method.invoke(instance);
+            return method.invoke(instance, params);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeELightException(e);
         }
     }
 
-    public static Object invokeMethod(String methodName, Object instance) {
+    public static Object invokeMethod(Object instance, String methodName) {
         try {
-            return invokeMethod(instance.getClass().getMethod(methodName), instance);
+            return invokeMethod(instance, instance.getClass().getMethod(methodName));
         } catch (NoSuchMethodException e) {
             throw new RuntimeELightException(e);
         }
@@ -103,6 +103,16 @@ public class ReflectionUtil {
 
     public static Class[] getGenericClasses(Field field) {
         ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+        Type[] types = genericType.getActualTypeArguments();
+        Class[] classes = new Class[types.length];
+        for (int i = 0; i < types.length; i++) {
+            classes[i] = (Class) types[i];
+        }
+        return classes;
+    }
+
+    public static Class[] getGenericClasses(Type type) {
+        ParameterizedType genericType = (ParameterizedType) type;
         Type[] types = genericType.getActualTypeArguments();
         Class[] classes = new Class[types.length];
         for (int i = 0; i < types.length; i++) {

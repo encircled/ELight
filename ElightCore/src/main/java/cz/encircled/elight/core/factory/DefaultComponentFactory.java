@@ -3,6 +3,7 @@ package cz.encircled.elight.core.factory;
 import cz.encircled.elight.core.ComponentDefinition;
 import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.DependencyDescription;
+import cz.encircled.elight.core.DependencyInjectionType;
 import cz.encircled.elight.core.exception.*;
 import cz.encircled.elight.core.util.CollectionUtil;
 import cz.encircled.elight.core.util.ReflectionUtil;
@@ -56,14 +57,14 @@ public class DefaultComponentFactory implements ComponentFactory {
         log.debug("Call singletons PreDestroy methods");
         for(ComponentDefinition definition : definitions.values()) {
             if(definition.isSingleton && definition.destroyMethod != null) {
-                ReflectionUtil.invokeMethod(definition.destroyMethod, getComponent(definition.name));
+                ReflectionUtil.invokeMethod(getComponent(definition.name), definition.destroyMethod);
             }
         }
     }
 
     private void afterComponentInstantiation(Object instance, ComponentDefinition definition) {
         if (definition.initMethod != null) {
-            ReflectionUtil.invokeMethod(definition.initMethod, instance);
+            ReflectionUtil.invokeMethod(instance, definition.initMethod);
         }
         for (ComponentPostProcessor processor : componentPostProcessors) {
             instance = processor.postProcess(instance);
@@ -218,13 +219,13 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @SuppressWarnings("unchecked")
     private void resolveDependency(String name, Object instance, DependencyDescription dependency) {
-        log.debug("Resolve dependency: field {} in component with name {}", dependency.targetField.getName(), name);
+        log.debug("Resolve dependency: {} in component with name {}", dependency, name);
         // TODO map, collections, exceptions, required
-        Class<?> type = dependency.targetField.getType();
-        Object objToInject = null;
-        if (Collection.class.isAssignableFrom(type)) {
-            Class<Object> genericClass = ReflectionUtil.getGenericClasses(dependency.targetField)[0];
-            Collection<Object> appropriateCollection = CollectionUtil.getAppropriateCollection((Class<? extends Collection<Object>>) type);
+        Class<?> targetClass = dependency.targetClass;
+        Object objToInject;
+        if (Collection.class.isAssignableFrom(targetClass)) {
+            Class<Object> genericClass = ReflectionUtil.getGenericClasses(dependency.targetType)[0];
+            Collection<Object> appropriateCollection = CollectionUtil.getAppropriateCollection((Class<? extends Collection<Object>>) targetClass);
 
             List<ComponentDefinition> definitionsByType = getDefinitions(genericClass);
             List<Object> componentsForCollection = new ArrayList<>(definitionsByType.size());
@@ -239,19 +240,19 @@ public class DefaultComponentFactory implements ComponentFactory {
                 }
             }
             objToInject = appropriateCollection;
-        } else if (type.isArray()) {
+        } else if (targetClass.isArray()) {
 
-            List<?> componentsToInject = getComponents(type.getComponentType());
-            objToInject = CollectionUtil.collectionToArray(componentsToInject, type.getComponentType());
+            List<?> componentsToInject = getComponents(targetClass.getComponentType());
+            objToInject = CollectionUtil.collectionToArray(componentsToInject, targetClass.getComponentType());
 
-        } else if (Map.class.isAssignableFrom(type)) {
-            Class[] genericClasses = ReflectionUtil.getGenericClasses(dependency.targetField);
+        } else if (Map.class.isAssignableFrom(targetClass)) {
+            Class[] genericClasses = ReflectionUtil.getGenericClasses(dependency.targetType);
             Class<Object> keyGenericClass = genericClasses[0];
             Class<Object> valueGenericClass = genericClasses[1];
 
             List<Object> componentsForKey = getComponents(keyGenericClass);
             List<Object> componentsForValue = getComponents(valueGenericClass);
-            Map<Object, Object> appropriateMap = CollectionUtil.getAppropriateMap((Class<? extends Map<Object, Object>>) type);
+            Map<Object, Object> appropriateMap = CollectionUtil.getAppropriateMap((Class<? extends Map<Object, Object>>) targetClass);
             if (componentsForKey.isEmpty() && !componentsForValue.isEmpty()) {
                 objToInject = CollectionUtil.collectionToMap(getComponents(valueGenericClass), appropriateMap);
             } else if (!componentsForKey.isEmpty() && componentsForValue.isEmpty()) {
@@ -266,12 +267,16 @@ public class DefaultComponentFactory implements ComponentFactory {
             if (dependency.hasNameQualifier()) {
                 objToInject = getComponent(dependency.nameQualifier, dependency.isRequired);
             } else if (dependency.qualifiers != null) {
-                objToInject = getComponentByQualifier(type, dependency.qualifiers, dependency.isRequired);
+                objToInject = getComponentByQualifier(targetClass, dependency.qualifiers, dependency.isRequired);
             } else {
-                objToInject = getComponent(type, dependency.isRequired);
+                objToInject = getComponent(targetClass, dependency.isRequired);
             }
         }
-        ReflectionUtil.setField(instance, dependency.targetField, objToInject);
+        if(dependency.dependencyInjectionType == DependencyInjectionType.FIELD) {
+            ReflectionUtil.setField(instance, dependency.targetField, objToInject);
+        } else {
+            ReflectionUtil.invokeMethod(instance, dependency.targetMethod, objToInject);
+        }
     }
 
     private Object getComponentByQualifier(Class<?> type, Object[] qualifiers, boolean isRequired) {

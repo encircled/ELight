@@ -2,6 +2,7 @@ package cz.encircled.elight.core.definition;
 
 import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.DependencyDescription;
+import cz.encircled.elight.core.DependencyInjectionType;
 import cz.encircled.elight.core.annotation.*;
 import cz.encircled.elight.core.context.ContextConstants;
 import cz.encircled.elight.core.creator.InstanceCreator;
@@ -17,6 +18,7 @@ import javax.inject.Named;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -79,23 +81,47 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
     @Override
     protected List<DependencyDescription> getDependencyDescriptions(Class<?> clazz) {
         List<DependencyDescription> result = new ArrayList<>();
-        List<Field> fields = ReflectionUtil.getAllFields(clazz);
-        for (Field field : fields) {
-            Wired wired = field.getAnnotation(Wired.class);
-            if (wired != null) {
-                Object[] qualifiers = findQualifiers(field.getAnnotations());
-                String named = getValueFromNamedAnnotation(field);
-                String finalName = StringUtils.isEmpty(named) ? wired.name() : named;
-                result.add(new DependencyDescription(field, wired.required(), finalName, qualifiers));
-            } else {
-                Inject inject = field.getAnnotation(Inject.class);
-                if (inject != null) {
-                    Object[] qualifiers = findQualifiers(field.getAnnotations());
-                    result.add(new DependencyDescription(field, true, getValueFromNamedAnnotation(field), qualifiers));
+        for (Field field : ReflectionUtil.getAllFields(clazz)) {
+            DependencyDescription dependencyDescription = buildDependencyDescription(field);
+            if(dependencyDescription != null) {
+                dependencyDescription.targetField = field;
+                dependencyDescription.targetClass = field.getType();
+                dependencyDescription.targetType = field.getGenericType();
+                dependencyDescription.dependencyInjectionType = DependencyInjectionType.FIELD;
+                result.add(dependencyDescription);
+            }
+        }
+        for (Method method : ReflectionUtil.getAllMethods(clazz)) {
+            DependencyDescription dependencyDescription = buildDependencyDescription(method);
+            if(dependencyDescription != null) {
+                if(method.getParameterCount() != 1) {
+                    throw new RuntimeELightException("Method for wiring must have one parameter : " + method);
                 }
+                dependencyDescription.targetType = method.getParameters()[0].getParameterizedType();
+                dependencyDescription.targetClass = method.getParameterTypes()[0];
+                dependencyDescription.targetMethod = method;
+                dependencyDescription.dependencyInjectionType = DependencyInjectionType.METHOD;
+                result.add(dependencyDescription);
             }
         }
         return result;
+    }
+
+    private DependencyDescription buildDependencyDescription(AccessibleObject field) {
+        Wired wired = field.getAnnotation(Wired.class);
+        if (wired != null) {
+            Object[] qualifiers = findQualifiers(field.getAnnotations());
+            String named = getValueFromNamedAnnotation(field);
+            String finalName = StringUtils.isEmpty(named) ? wired.name() : named;
+            return new DependencyDescription(wired.required(), finalName, qualifiers);
+        } else {
+            Inject inject = field.getAnnotation(Inject.class);
+            if (inject != null) {
+                Object[] qualifiers = findQualifiers(field.getAnnotations());
+                return new DependencyDescription(true, getValueFromNamedAnnotation(field), qualifiers);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -116,8 +142,8 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
         return annotation != null ? annotation.value() : null;
     }
 
-    private String getValueFromNamedAnnotation(Field field) {
-        Named namedAnnotation = field.getAnnotation(Named.class);
+    private String getValueFromNamedAnnotation(AccessibleObject accessibleObject) {
+        Named namedAnnotation = accessibleObject.getAnnotation(Named.class);
         return namedAnnotation == null ? null : namedAnnotation.value();
     }
 
@@ -130,7 +156,7 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                     throw new RuntimeELightException("Qualifier annotation must have one method - " +
                             fieldAnnotation.getClass().toString());
                 }
-                Object value = ReflectionUtil.invokeMethod(methods[0], fieldAnnotation);
+                Object value = ReflectionUtil.invokeMethod(fieldAnnotation, methods[0]);
                 if(value != null)
                     qualifiers.add(value);
             }
