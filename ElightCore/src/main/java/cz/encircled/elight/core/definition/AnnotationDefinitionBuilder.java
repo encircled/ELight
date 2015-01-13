@@ -4,6 +4,7 @@ import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.DependencyDescription;
 import cz.encircled.elight.core.DependencyInjectionType;
 import cz.encircled.elight.core.annotation.*;
+import cz.encircled.elight.core.annotation.Scope;
 import cz.encircled.elight.core.context.ContextConstants;
 import cz.encircled.elight.core.creator.InstanceCreator;
 import cz.encircled.elight.core.exception.RuntimeELightException;
@@ -13,10 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Qualifier;
-import javax.inject.Singleton;
+import javax.inject.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -87,7 +85,10 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                 dependencyDescription.targetField = field;
                 dependencyDescription.targetClass = field.getType();
                 dependencyDescription.targetType = field.getGenericType();
-                dependencyDescription.dependencyInjectionType = DependencyInjectionType.FIELD;
+                if(dependencyDescription.targetClass.equals(Provider.class))
+                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.PROVIDER;
+                else
+                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.FIELD;
                 result.add(dependencyDescription);
             }
         }
@@ -100,7 +101,10 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                 dependencyDescription.targetType = method.getParameters()[0].getParameterizedType();
                 dependencyDescription.targetClass = method.getParameterTypes()[0];
                 dependencyDescription.targetMethod = method;
-                dependencyDescription.dependencyInjectionType = DependencyInjectionType.METHOD;
+                if(dependencyDescription.targetClass.equals(Provider.class))
+                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.PROVIDER;
+                else
+                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.METHOD;
                 result.add(dependencyDescription);
             }
         }
