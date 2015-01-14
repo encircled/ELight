@@ -82,13 +82,16 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
         for (Field field : ReflectionUtil.getAllFields(clazz)) {
             DependencyDescription dependencyDescription = buildDependencyDescription(field);
             if(dependencyDescription != null) {
+                Class<?> fieldType = field.getType();
+                if(fieldType.equals(Provider.class)) {
+                    dependencyDescription.isProvider = true;
+                    dependencyDescription.targetClass = ReflectionUtil.getGenericClasses(field)[0];
+                } else {
+                    dependencyDescription.targetClass = field.getType();
+                    dependencyDescription.targetType = field.getGenericType();
+                }
                 dependencyDescription.targetField = field;
-                dependencyDescription.targetClass = field.getType();
-                dependencyDescription.targetType = field.getGenericType();
-                if(dependencyDescription.targetClass.equals(Provider.class))
-                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.PROVIDER;
-                else
-                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.FIELD;
+                dependencyDescription.dependencyInjectionType = DependencyInjectionType.FIELD;
                 result.add(dependencyDescription);
             }
         }
@@ -101,10 +104,7 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                 dependencyDescription.targetType = method.getParameters()[0].getParameterizedType();
                 dependencyDescription.targetClass = method.getParameterTypes()[0];
                 dependencyDescription.targetMethod = method;
-                if(dependencyDescription.targetClass.equals(Provider.class))
-                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.PROVIDER;
-                else
-                    dependencyDescription.dependencyInjectionType = DependencyInjectionType.METHOD;
+                dependencyDescription.dependencyInjectionType = DependencyInjectionType.METHOD;
                 result.add(dependencyDescription);
             }
         }

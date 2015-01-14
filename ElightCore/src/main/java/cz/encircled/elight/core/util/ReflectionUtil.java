@@ -41,14 +41,6 @@ public class ReflectionUtil {
         }
     }
 
-    public static Object invokeMethod(Object instance, String methodName) {
-        try {
-            return invokeMethod(instance, instance.getClass().getMethod(methodName));
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeELightException(e);
-        }
-    }
-
     public static void setField(Object instance, Field field, Object value) {
         try {
             field.setAccessible(true);
@@ -102,13 +94,25 @@ public class ReflectionUtil {
     }
 
     public static Class[] getGenericClasses(Field field) {
-        ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-        Type[] types = genericType.getActualTypeArguments();
-        Class[] classes = new Class[types.length];
-        for (int i = 0; i < types.length; i++) {
-            classes[i] = (Class) types[i];
+        Type fieldType = field.getGenericType();
+        // Check if field has generic
+        if (fieldType instanceof ParameterizedType) {
+            ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+            Type[] types = genericType.getActualTypeArguments();
+            Class[] classes = new Class[types.length];
+            for (int i = 0; i < types.length; i++) {
+                Type type = types[i];
+                if (type instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) type;
+                    classes[i] = (Class) parameterizedType.getRawType();
+                } else {
+                    classes[i] = (Class) type;
+                }
+            }
+            return classes;
+        } else {
+            return new Class[]{};
         }
-        return classes;
     }
 
     public static Class[] getGenericClasses(Type type) {

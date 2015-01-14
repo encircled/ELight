@@ -27,6 +27,8 @@ public class DependencyDescription {
 
     public Object[] qualifiers;
 
+    public boolean isProvider = false;
+
     public DependencyDescription(boolean isRequired, String nameQualifier, Object[] qualifiers) {
         this.isRequired = isRequired;
         this.nameQualifier = nameQualifier;

@@ -5,6 +5,6 @@ package cz.encircled.elight.core;
  */
 public enum DependencyInjectionType {
 
-    FIELD, METHOD, PROVIDER
+    FIELD, METHOD
 
 }
