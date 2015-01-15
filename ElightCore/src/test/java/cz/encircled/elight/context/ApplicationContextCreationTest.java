@@ -1,6 +1,5 @@
 package cz.encircled.elight.context;
 
-import cz.encircled.elight.core.annotation.Order;
 import cz.encircled.elight.core.context.ApplicationContext;
 import cz.encircled.elight.core.exception.ComponentNotFoundException;
 import cz.encircled.elight.model.condition.FalseConditionComponent;
@@ -44,17 +43,6 @@ public class ApplicationContextCreationTest extends AbstractContextTest {
         Map<String, Window> windowAsValueMap = house.getWindowAsValueMap();
         Assert.assertNotNull(windowAsValueMap);
         Assert.assertTrue(windowAsValueMap.size() > 0);
-    }
-
-    @Test
-    public void collectionsWithOrderTest() {
-        House house = applicationContext.getComponent(House.class);
-        Assert.assertNotNull(house.getWindows());
-        for (int i = 0; i < house.getWindows().size(); i++) {
-            Window window = house.getWindows().get(i);
-            int order = window.getClass().getAnnotation(Order.class).value();
-            Assert.assertEquals(i, order);
-        }
     }
 
     @Test(expected = ComponentNotFoundException.class)

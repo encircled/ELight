@@ -214,11 +214,13 @@ public class DefaultComponentFactory implements ComponentFactory {
         resolvedDependencies.put(name, component);
     }
 
-    public List<ComponentDefinition> getDefinitions(Class<?> type) {
+    /**
+     * Resolved dependencies are not included
+     */
+    public List<ComponentDefinition> getDefinitionsOfType(Class<?> type) {
         return definitions.values().stream().filter(definition -> type.isAssignableFrom(definition.clazz)).collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unchecked")
     private void resolveDependency(String componentName, Object componentInstance, DependencyDescription dependency) {
         log.debug("Resolve dependency: {} in component with componentName {}", dependency, componentName);
 
@@ -231,33 +233,27 @@ public class DefaultComponentFactory implements ComponentFactory {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Object getObjectToInject(DependencyDescription dependency) {
         Object objToInject;
         Class<?> targetClass = dependency.targetClass;
         if (Collection.class.isAssignableFrom(targetClass)) {
-            Class<Object> genericClass = ReflectionUtil.getGenericClasses(dependency.targetType)[0];
+            Class[] genericClasses = ReflectionUtil.getGenericClasses(dependency.targetType);
+            if(genericClasses.length == 0) {
+                throw new RawTypeException("Generic type must be specified: " + dependency.targetType);
+            }
             Collection<Object> appropriateCollection = CollectionUtil.getAppropriateCollection((Class<? extends Collection<Object>>) targetClass);
-
-            List<ComponentDefinition> definitionsByType = getDefinitions(genericClass);
-            List<Object> componentsForCollection = new ArrayList<>(definitionsByType.size());
-            Collections.sort(definitionsByType, (o1, o2) -> Integer.compare(o1.order, o2.order));
-            for (ComponentDefinition componentDefinition : definitionsByType) {
-                componentsForCollection.add(getComponent(componentDefinition.name));
-            }
-            appropriateCollection.addAll(componentsForCollection);
-            for (Object candidate : resolvedDependencies.values()) {
-                if (genericClass.isAssignableFrom(candidate.getClass())) {
-                    appropriateCollection.add(candidate);
-                }
-            }
-            objToInject = appropriateCollection;
+            objToInject = findOrderedComponentsToInject(appropriateCollection, genericClasses[0]);
         } else if (targetClass.isArray()) {
-
-            List<?> componentsToInject = getComponents(targetClass.getComponentType());
-            objToInject = CollectionUtil.collectionToArray(componentsToInject, targetClass.getComponentType());
-
+            List<Object> componentsToInject = new ArrayList<>(2);
+            Class<?> componentType = targetClass.getComponentType();
+            findOrderedComponentsToInject(componentsToInject, componentType);
+            objToInject = CollectionUtil.collectionToArray(componentsToInject, componentType);
         } else if (Map.class.isAssignableFrom(targetClass)) {
             Class[] genericClasses = ReflectionUtil.getGenericClasses(dependency.targetType);
+            if(genericClasses.length == 0) {
+                throw new RawTypeException("Generic type must be specified: " + dependency.targetType);
+            }
             Class<Object> keyGenericClass = genericClasses[0];
             Class<Object> valueGenericClass = genericClasses[1];
 
@@ -278,7 +274,7 @@ public class DefaultComponentFactory implements ComponentFactory {
             if (dependency.hasNameQualifier()) {
                 objToInject = getComponent(dependency.nameQualifier, dependency.isRequired);
             } else if (dependency.qualifiers != null) {
-                objToInject = getComponentByQualifier(targetClass, dependency.qualifiers, dependency.isRequired);
+                objToInject = getComponentByQualifiers(targetClass, dependency.qualifiers, dependency.isRequired);
             } else {
                 objToInject = getComponent(targetClass, dependency.isRequired);
             }
@@ -286,7 +282,24 @@ public class DefaultComponentFactory implements ComponentFactory {
         return objToInject;
     }
 
-    private Object getComponentByQualifier(Class<?> type, Object[] qualifiers, boolean isRequired) {
+    /*
+     * We must collect definitions to sort components
+     */
+    private Collection<Object> findOrderedComponentsToInject(Collection<Object> foundComponents, Class<?> componentType) {
+        List<ComponentDefinition> definitionsByType = getDefinitionsOfType(componentType);
+        Collections.sort(definitionsByType, (o1, o2) -> Integer.compare(o1.order, o2.order));
+        for (ComponentDefinition componentDefinition : definitionsByType) {
+            foundComponents.add(getComponent(componentDefinition.name));
+        }
+        for (Object candidate : resolvedDependencies.values()) {
+            if (componentType.isAssignableFrom(candidate.getClass())) {
+                foundComponents.add(candidate);
+            }
+        }
+        return foundComponents;
+    }
+
+    private Object getComponentByQualifiers(Class<?> type, Object[] qualifiers, boolean isRequired) {
         List<ComponentDefinition> found = definitions.values().stream().unordered().filter(definition -> {
             return type.isAssignableFrom(definition.clazz) && Arrays.equals(qualifiers, definition.qualifiers);
         }).collect(Collectors.toList());
@@ -301,6 +314,9 @@ public class DefaultComponentFactory implements ComponentFactory {
         return getComponent(found.get(0).name);
     }
 
+    /**
+     * Implementation of JSR 330 {@link javax.inject.Provider}
+     */
     private class DependencyProvider implements Provider {
 
         private DependencyDescription dependencyDescription;
@@ -313,6 +329,7 @@ public class DefaultComponentFactory implements ComponentFactory {
         public Object get() {
             return getObjectToInject(dependencyDescription);
         }
+
     }
 
 }
