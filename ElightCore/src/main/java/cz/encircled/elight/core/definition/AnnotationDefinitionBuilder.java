@@ -7,6 +7,7 @@ import cz.encircled.elight.core.annotation.*;
 import cz.encircled.elight.core.annotation.Scope;
 import cz.encircled.elight.core.context.ContextConstants;
 import cz.encircled.elight.core.creator.InstanceCreator;
+import cz.encircled.elight.core.exception.RawTypeException;
 import cz.encircled.elight.core.exception.RuntimeELightException;
 import cz.encircled.elight.core.util.ComponentUtil;
 import cz.encircled.elight.core.util.ReflectionUtil;
@@ -19,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +87,11 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                 Class<?> fieldType = field.getType();
                 if(fieldType.equals(Provider.class)) {
                     dependencyDescription.isProvider = true;
-                    dependencyDescription.targetClass = ReflectionUtil.getGenericClasses(field)[0];
+                    Type[] typesOfGenericClasses = ReflectionUtil.getTypesOfGenericClasses(field);
+                    if(typesOfGenericClasses.length == 0)
+                        throw new RawTypeException("Error in " + clazz.getName() + ". Provider must have generic type specified.");
+                    dependencyDescription.targetClass = ReflectionUtil.getClassOfType(typesOfGenericClasses[0]);
+                    dependencyDescription.targetType = typesOfGenericClasses[0];
                 } else {
                     dependencyDescription.targetClass = field.getType();
                     dependencyDescription.targetType = field.getGenericType();

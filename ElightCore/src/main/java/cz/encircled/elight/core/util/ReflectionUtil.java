@@ -93,27 +93,39 @@ public class ReflectionUtil {
         return !Modifier.isAbstract(clazz.getModifiers()) && !clazz.isInterface();
     }
 
-    public static Class[] getGenericClasses(Field field) {
+    public static Class<?> getClassOfType(Type type) {
+        return type instanceof ParameterizedType ? (Class<?>) ((ParameterizedType) type).getRawType() : (Class<?>) type;
+    }
+
+    public static Type[] getTypesOfGenericClasses(Field field) {
         Type fieldType = field.getGenericType();
         // Check if field has generic
         if (fieldType instanceof ParameterizedType) {
             ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-            Type[] types = genericType.getActualTypeArguments();
-            Class[] classes = new Class[types.length];
-            for (int i = 0; i < types.length; i++) {
-                Type type = types[i];
-                if (type instanceof ParameterizedType) {
-                    ParameterizedType parameterizedType = (ParameterizedType) type;
-                    classes[i] = (Class) parameterizedType.getRawType();
-                } else {
-                    classes[i] = (Class) type;
-                }
-            }
-            return classes;
+            return genericType.getActualTypeArguments();
         } else {
-            return new Class[]{};
+            return new Type[]{};
         }
     }
+
+    public static Class[] getGenericClasses(Field field) {
+        Type[] types = getTypesOfGenericClasses(field);
+        Class[] classes = new Class[types.length];
+        for (int i = 0; i < types.length; i++) {
+            Type type = types[i];
+            if (type instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) type;
+                classes[i] = (Class) parameterizedType.getRawType();
+            } else {
+                classes[i] = (Class) type;
+            }
+        }
+        return classes;
+    }
+
+//    public static Class[] getGenericClassesOfGeneric(Field field) {
+//
+//    }
 
     public static Class[] getGenericClasses(Type type) {
         ParameterizedType genericType = (ParameterizedType) type;

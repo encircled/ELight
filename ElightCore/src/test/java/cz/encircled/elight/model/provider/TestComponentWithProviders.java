@@ -4,6 +4,7 @@ import cz.encircled.elight.core.annotation.Component;
 import cz.encircled.elight.core.annotation.Wired;
 import cz.encircled.elight.model.house.Door;
 import cz.encircled.elight.model.house.House;
+import cz.encircled.elight.model.postprocess.PrototypeComponentToProcess;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -25,10 +26,10 @@ public class TestComponentWithProviders {
     private Provider<House> jsr330SingletonProvider;
 
     @Wired
-    private Provider<House> prototypeProvider;
+    private Provider<PrototypeComponentToProcess> prototypeProvider;
 
     @Inject
-    private Provider<House> jsr330PrototypeProvider;
+    private Provider<PrototypeComponentToProcess> jsr330PrototypeProvider;
 
     public Provider<House> getSingletonProvider() {
         return singletonProvider;
@@ -38,11 +39,11 @@ public class TestComponentWithProviders {
         return jsr330SingletonProvider;
     }
 
-    public Provider<House> getPrototypeProvider() {
+    public Provider<PrototypeComponentToProcess> getPrototypeProvider() {
         return prototypeProvider;
     }
 
-    public Provider<House> getJsr330PrototypeProvider() {
+    public Provider<PrototypeComponentToProcess> getJsr330PrototypeProvider() {
         return jsr330PrototypeProvider;
     }
 

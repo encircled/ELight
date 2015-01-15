@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.inject.Provider;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -218,11 +219,21 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private void resolveDependency(String name, Object instance, DependencyDescription dependency) {
-        log.debug("Resolve dependency: {} in component with name {}", dependency, name);
-        // TODO map, collections, exceptions, required
-        Class<?> targetClass = dependency.targetClass;
+    private void resolveDependency(String componentName, Object componentInstance, DependencyDescription dependency) {
+        log.debug("Resolve dependency: {} in component with componentName {}", dependency, componentName);
+
+        Object objToInject = dependency.isProvider ? new DependencyProvider(dependency) : getObjectToInject(dependency);
+
+        if(dependency.dependencyInjectionType == DependencyInjectionType.FIELD) {
+            ReflectionUtil.setField(componentInstance, dependency.targetField, objToInject);
+        } else {
+            ReflectionUtil.invokeMethod(componentInstance, dependency.targetMethod, objToInject);
+        }
+    }
+
+    private Object getObjectToInject(DependencyDescription dependency) {
         Object objToInject;
+        Class<?> targetClass = dependency.targetClass;
         if (Collection.class.isAssignableFrom(targetClass)) {
             Class<Object> genericClass = ReflectionUtil.getGenericClasses(dependency.targetType)[0];
             Collection<Object> appropriateCollection = CollectionUtil.getAppropriateCollection((Class<? extends Collection<Object>>) targetClass);
@@ -272,11 +283,7 @@ public class DefaultComponentFactory implements ComponentFactory {
                 objToInject = getComponent(targetClass, dependency.isRequired);
             }
         }
-        if(dependency.dependencyInjectionType == DependencyInjectionType.FIELD) {
-            ReflectionUtil.setField(instance, dependency.targetField, objToInject);
-        } else {
-            ReflectionUtil.invokeMethod(instance, dependency.targetMethod, objToInject);
-        }
+        return objToInject;
     }
 
     private Object getComponentByQualifier(Class<?> type, Object[] qualifiers, boolean isRequired) {
@@ -292,6 +299,20 @@ public class DefaultComponentFactory implements ComponentFactory {
             throw new AmbiguousDependencyException(type, qualifiers);
         }
         return getComponent(found.get(0).name);
+    }
+
+    private class DependencyProvider implements Provider {
+
+        private DependencyDescription dependencyDescription;
+
+        public DependencyProvider(DependencyDescription dependencyDescription) {
+            this.dependencyDescription = dependencyDescription;
+        }
+
+        @Override
+        public Object get() {
+            return getObjectToInject(dependencyDescription);
+        }
     }
 
 }

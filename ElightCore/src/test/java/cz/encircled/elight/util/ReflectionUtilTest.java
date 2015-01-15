@@ -17,6 +17,8 @@ public class ReflectionUtilTest {
 
     public List<String> stringGenericField;
 
+    public List rawListField;
+
     public Map<String, Long> mapGenericField;
 
     public Map<String, List<String>> mapWithInnerGenericField;
@@ -47,6 +49,10 @@ public class ReflectionUtilTest {
         Assert.assertEquals(2, mapWithInnerGenericFields.length);
         Assert.assertEquals(String.class, mapWithInnerGenericFields[0]);
         Assert.assertEquals(List.class, mapWithInnerGenericFields[1]);
+
+        Class[] rawListFields = ReflectionUtil.getGenericClasses(getField("rawListField"));
+        Assert.assertNotNull(rawListFields);
+        Assert.assertEquals(0, rawListFields.length);
     }
 
     private Field getField(String name) {
