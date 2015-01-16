@@ -2,8 +2,8 @@ package cz.encircled.elight.model.provider;
 
 import cz.encircled.elight.core.annotation.Component;
 import cz.encircled.elight.core.annotation.Wired;
-import cz.encircled.elight.model.house.Door;
 import cz.encircled.elight.model.house.House;
+import cz.encircled.elight.model.house.Window;
 import cz.encircled.elight.model.postprocess.PrototypeComponentToProcess;
 
 import javax.inject.Inject;
@@ -17,7 +17,7 @@ import java.util.List;
 public class TestComponentWithProviders {
 
     @Wired
-    private Provider<List<Door>> doorsProvider;
+    private Provider<List<Window>> windowsProvider;
 
     @Wired
     private Provider<House> singletonProvider;
@@ -30,6 +30,14 @@ public class TestComponentWithProviders {
 
     @Inject
     private Provider<PrototypeComponentToProcess> jsr330PrototypeProvider;
+
+    private Provider<List<Window>> methodWindowsProvider;
+
+    private Provider<House> jsr330MethodSingletonProvider;
+
+    private Provider<PrototypeComponentToProcess> methodPrototypeProvider;
+
+
 
     public Provider<House> getSingletonProvider() {
         return singletonProvider;
@@ -45,6 +53,37 @@ public class TestComponentWithProviders {
 
     public Provider<PrototypeComponentToProcess> getJsr330PrototypeProvider() {
         return jsr330PrototypeProvider;
+    }
+
+    public Provider<PrototypeComponentToProcess> getMethodPrototypeProvider() {
+        return methodPrototypeProvider;
+    }
+
+    public Provider<List<Window>> getWindowsProvider() {
+        return windowsProvider;
+    }
+
+    @Wired
+    public void setMethodPrototypeProvider(Provider<PrototypeComponentToProcess> methodPrototypeProvider) {
+        this.methodPrototypeProvider = methodPrototypeProvider;
+    }
+
+    public Provider<House> getJsr330MethodSingletonProvider() {
+        return jsr330MethodSingletonProvider;
+    }
+
+    @Inject
+    public void setJsr330MethodSingletonProvider(Provider<House> jsr330MethodSingletonProvider) {
+        this.jsr330MethodSingletonProvider = jsr330MethodSingletonProvider;
+    }
+
+    public Provider<List<Window>> getMethodWindowsProvider() {
+        return methodWindowsProvider;
+    }
+
+    @Wired
+    public void setMethodWindowsProvider(Provider<List<Window>> methodWindowsProvider) {
+        this.methodWindowsProvider = methodWindowsProvider;
     }
 
 }

@@ -14,6 +14,7 @@ public class CustomQualifierTest extends AbstractContextTest {
         super("cz.encircled.elight.model.qualifier.custom");
     }
 
+    // TODO test methods injection
     @Test
     public void basicQualifierTest() {
         CustomQualifierWiring component = applicationContext.getComponent(CustomQualifierWiring.class);

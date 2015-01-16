@@ -98,11 +98,13 @@ public class ReflectionUtil {
     }
 
     public static Type[] getTypesOfGenericClasses(Field field) {
-        Type fieldType = field.getGenericType();
-        // Check if field has generic
-        if (fieldType instanceof ParameterizedType) {
-            ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-            return genericType.getActualTypeArguments();
+        return getTypesOfGenericClasses(field.getGenericType());
+    }
+
+    public static Type[] getTypesOfGenericClasses(Type type) {
+        // Check if type has generic (is parameterized)
+        if (type instanceof ParameterizedType) {
+            return ((ParameterizedType) type).getActualTypeArguments();
         } else {
             return new Type[]{};
         }
