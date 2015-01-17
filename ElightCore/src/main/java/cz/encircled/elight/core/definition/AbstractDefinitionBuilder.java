@@ -1,7 +1,6 @@
 package cz.encircled.elight.core.definition;
 
-import cz.encircled.elight.core.ComponentDefinition;
-import cz.encircled.elight.core.DependencyDescription;
+import cz.encircled.elight.core.definition.dependency.DependencyDescription;
 import cz.encircled.elight.core.creator.InstanceCreator;
 
 import java.lang.reflect.Method;

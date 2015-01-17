@@ -7,7 +7,7 @@ import org.junit.Test;
 /**
  * Created by Kisel on 1/12/2015.
  */
-public class WiringViaSetterTest extends AbstractContextTest {
+public class WiringViaMethodsTest extends AbstractContextTest {
 
     @Test
     public void basicSetterWiringTest() {
@@ -30,6 +30,14 @@ public class WiringViaSetterTest extends AbstractContextTest {
         Assert.assertNotNull(house.getWindowsViaSetter());
 
 
+    }
+
+    @Test
+    public void basicGetterWiringTest() {
+        House component = applicationContext.getComponent(House.class);
+
+        Assert.assertNotNull(component);
+        Assert.assertNotNull(component.getWindowAsValueMapViaGetter());
     }
 
 }

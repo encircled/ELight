@@ -1,6 +1,6 @@
 package cz.encircled.elight.core.factory;
 
-import cz.encircled.elight.core.ComponentDefinition;
+import cz.encircled.elight.core.definition.ComponentDefinition;
 import cz.encircled.elight.core.ComponentPostProcessor;
 
 import java.util.List;

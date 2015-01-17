@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * Created by Kisel on 1/12/2015.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.TYPE})
+@Target({ElementType.FIELD, ElementType.TYPE, ElementType.METHOD})
 @Qualifier
 public @interface AnotherTestCustomQualifier {
 

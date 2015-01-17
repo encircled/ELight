@@ -41,6 +41,8 @@ public class House extends AbstractHouse implements Building {
 
     private Map<String, Window> windowAsValueMapViaSetter;
 
+    private Map<String, Window> windowAsValueMapViaGetter;
+
     private List<Window> windowsVia330Setter;
 
     private Window[] windowsArrayVia330Setter;
@@ -166,6 +168,11 @@ public class House extends AbstractHouse implements Building {
     @Inject
     public void setWindowAsValueMapVia330Setter(Map<String, Window> windowAsValueMapVia330Setter) {
         this.windowAsValueMapVia330Setter = windowAsValueMapVia330Setter;
+    }
+
+    @Wired
+    public Map<String, Window> getWindowAsValueMapViaGetter() {
+        return windowAsValueMapViaGetter;
     }
 
 }

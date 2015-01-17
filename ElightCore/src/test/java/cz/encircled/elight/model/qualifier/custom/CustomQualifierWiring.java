@@ -1,6 +1,7 @@
 package cz.encircled.elight.model.qualifier.custom;
 
 import cz.encircled.elight.core.annotation.Component;
+import cz.encircled.elight.core.annotation.Wired;
 
 import javax.inject.Inject;
 
@@ -10,7 +11,7 @@ import javax.inject.Inject;
 @Component
 public class CustomQualifierWiring {
 
-    @Inject
+    @Wired
     @TestCustomQualifier(color = TestCustomQualifier.Color.RED)
     private CustomQualifierInterface red;
 
@@ -25,7 +26,11 @@ public class CustomQualifierWiring {
     @Inject
     @TestCustomQualifier(color = TestCustomQualifier.Color.BLACK)
     @AnotherTestCustomQualifier(anotherColor = AnotherTestCustomQualifier.AnotherColor.WHITE)
-    private BlackAndWhiteCustomQualifier blackAndWhite;
+    private CustomQualifierInterface blackAndWhite;
+
+    private CustomQualifierInterface methodBlackAndWhite;
+
+    private CustomQualifierInterface getterBlackAndWhite;
 
     public CustomQualifierInterface getRed() {
         return red;
@@ -39,7 +44,26 @@ public class CustomQualifierWiring {
         return white;
     }
 
-    public BlackAndWhiteCustomQualifier getBlackAndWhite() {
+    public CustomQualifierInterface getBlackAndWhite() {
         return blackAndWhite;
     }
+
+    public CustomQualifierInterface getMethodBlackAndWhite() {
+        return methodBlackAndWhite;
+    }
+
+    @Inject
+    @TestCustomQualifier(color = TestCustomQualifier.Color.BLACK)
+    @AnotherTestCustomQualifier(anotherColor = AnotherTestCustomQualifier.AnotherColor.WHITE)
+    public void setMethodBlackAndWhite(CustomQualifierInterface methodBlackAndWhite) {
+        this.methodBlackAndWhite = methodBlackAndWhite;
+    }
+
+    @Inject
+    @TestCustomQualifier(color = TestCustomQualifier.Color.BLACK)
+    @AnotherTestCustomQualifier(anotherColor = AnotherTestCustomQualifier.AnotherColor.WHITE)
+    public CustomQualifierInterface getGetterBlackAndWhite() {
+        return getterBlackAndWhite;
+    }
+
 }

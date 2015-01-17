@@ -1,4 +1,4 @@
-package cz.encircled.elight.core;
+package cz.encircled.elight.core.definition.dependency;
 
 import org.apache.commons.lang3.StringUtils;
 

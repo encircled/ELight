@@ -1,9 +1,9 @@
 package cz.encircled.elight.core.factory;
 
-import cz.encircled.elight.core.ComponentDefinition;
+import cz.encircled.elight.core.definition.ComponentDefinition;
 import cz.encircled.elight.core.ComponentPostProcessor;
-import cz.encircled.elight.core.DependencyDescription;
-import cz.encircled.elight.core.DependencyInjectionType;
+import cz.encircled.elight.core.definition.dependency.DependencyDescription;
+import cz.encircled.elight.core.definition.dependency.DependencyInjectionType;
 import cz.encircled.elight.core.exception.*;
 import cz.encircled.elight.core.util.CollectionUtil;
 import cz.encircled.elight.core.util.ReflectionUtil;
@@ -138,8 +138,10 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     public ComponentDefinition getDefinition(String name) {
-        // TODO exception
-        return definitions.get(name);
+        ComponentDefinition definition = definitions.get(name);
+        if(definition == null)
+            throw new ComponentNotFoundException(name);
+        return definition;
     }
 
     @Override

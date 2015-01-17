@@ -1,6 +1,7 @@
 package cz.encircled.elight.core.util;
 
 import cz.encircled.elight.core.exception.RuntimeELightException;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -13,6 +14,8 @@ import java.util.Set;
  * Created by Encircled on 16/09/2014.
  */
 public class ReflectionUtil {
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     public static Method findAnnotatedMethod(Class<?> clazz, Class<? extends Annotation> annotationClass) {
         for (Method method : getAllMethods(clazz)) {
@@ -57,6 +60,15 @@ public class ReflectionUtil {
             addDeclaredFields(fields, superClass);
         }
         return fields;
+    }
+
+    public static Field getFieldSafe(Class<?> clazz, String fieldName) {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            log.debug("Field {} not found on class {}", fieldName, clazz);
+            return null;
+        }
     }
 
     private static void addDeclaredFields(List<Field> fields, Class<?> sourceClazz) {
@@ -124,10 +136,6 @@ public class ReflectionUtil {
         }
         return classes;
     }
-
-//    public static Class[] getGenericClassesOfGeneric(Field field) {
-//
-//    }
 
     public static Class[] getGenericClasses(Type type) {
         ParameterizedType genericType = (ParameterizedType) type;

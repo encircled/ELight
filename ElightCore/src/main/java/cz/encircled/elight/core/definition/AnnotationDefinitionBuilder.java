@@ -1,8 +1,8 @@
 package cz.encircled.elight.core.definition;
 
 import cz.encircled.elight.core.ComponentPostProcessor;
-import cz.encircled.elight.core.DependencyDescription;
-import cz.encircled.elight.core.DependencyInjectionType;
+import cz.encircled.elight.core.definition.dependency.DependencyDescription;
+import cz.encircled.elight.core.definition.dependency.DependencyInjectionType;
 import cz.encircled.elight.core.annotation.*;
 import cz.encircled.elight.core.annotation.Scope;
 import cz.encircled.elight.core.context.ContextConstants;
@@ -82,37 +82,46 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
     protected List<DependencyDescription> getDependencyDescriptions(Class<?> clazz) {
         List<DependencyDescription> result = new ArrayList<>();
         for (Field field : ReflectionUtil.getAllFields(clazz)) {
-            buildFieldDependencyDefinition(clazz, result, field);
+            DependencyDescription dependencyDescription = buildBasicDependencyDescription(field);
+            buildFieldDependencyDefinition(clazz, result, field, dependencyDescription);
         }
         for (Method method : ReflectionUtil.getAllMethods(clazz)) {
-            DependencyDescription dependencyDescription = buildBasicDependencyDescription(method);
-            if(dependencyDescription != null) {
-                if(method.getParameterCount() != 1) {
-                    throw new RuntimeELightException("Method for wiring must have one parameter : " + method);
-                }
-                Class<?> paramClass = method.getParameterTypes()[0];
-                if(paramClass.equals(Provider.class)) {
-                    dependencyDescription.isProvider = true;
-                    Type[] typesOfGenericClasses = ReflectionUtil.getTypesOfGenericClasses(method.getParameters()[0].getParameterizedType());
-                    if(typesOfGenericClasses.length == 0)
-                        throw new RawTypeException("Error in " + clazz.getName() + ". Provider must have generic type specified.");
-                    dependencyDescription.targetClass = ReflectionUtil.getClassOfType(typesOfGenericClasses[0]);
-                    dependencyDescription.targetType = typesOfGenericClasses[0];
-                } else {
-                    dependencyDescription.targetType = method.getParameters()[0].getParameterizedType();
-                    dependencyDescription.targetClass = paramClass;
-                }
-
-                dependencyDescription.targetMethod = method;
-                dependencyDescription.dependencyInjectionType = DependencyInjectionType.METHOD;
-                result.add(dependencyDescription);
-            }
+            buildMethodDependencyDefinition(clazz, result, method);
         }
         return result;
     }
 
-    private void buildFieldDependencyDefinition(Class<?> clazz, List<DependencyDescription> result, Field field) {
-        DependencyDescription dependencyDescription = buildBasicDependencyDescription(field);
+    private void buildMethodDependencyDefinition(Class<?> clazz, List<DependencyDescription> result, Method method) {
+        DependencyDescription dependencyDescription = buildBasicDependencyDescription(method);
+        if(dependencyDescription != null) {
+            if(method.getParameterCount() == 0) {
+                Field fieldFromGetter = ReflectionUtil.getFieldSafe(clazz, ComponentUtil.getFieldNameFromGetter(method));
+                buildFieldDependencyDefinition(clazz, result, fieldFromGetter, dependencyDescription);
+                return;
+            }
+            if(method.getParameterCount() > 1) {
+                throw new RuntimeELightException("Method for wiring must have one parameter : " + method);
+            }
+            Class<?> paramClass = method.getParameterTypes()[0];
+            if(paramClass.equals(Provider.class)) {
+                dependencyDescription.isProvider = true;
+                Type[] typesOfGenericClasses = ReflectionUtil.getTypesOfGenericClasses(method.getParameters()[0].getParameterizedType());
+                if(typesOfGenericClasses.length == 0)
+                    throw new RawTypeException("Error in " + clazz.getName() + ". Provider must have generic type specified.");
+                dependencyDescription.targetClass = ReflectionUtil.getClassOfType(typesOfGenericClasses[0]);
+                dependencyDescription.targetType = typesOfGenericClasses[0];
+            } else {
+                dependencyDescription.targetType = method.getParameters()[0].getParameterizedType();
+                dependencyDescription.targetClass = paramClass;
+            }
+
+            dependencyDescription.targetMethod = method;
+            dependencyDescription.dependencyInjectionType = DependencyInjectionType.METHOD;
+            result.add(dependencyDescription);
+        }
+    }
+
+    private void buildFieldDependencyDefinition(Class<?> clazz, List<DependencyDescription> result, Field field, DependencyDescription dependencyDescription) {
         if(dependencyDescription != null) {
             Class<?> fieldType = field.getType();
             if(fieldType.equals(Provider.class)) {
@@ -126,6 +135,7 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                 dependencyDescription.targetClass = field.getType();
                 dependencyDescription.targetType = field.getGenericType();
             }
+
             dependencyDescription.targetField = field;
             dependencyDescription.dependencyInjectionType = DependencyInjectionType.FIELD;
             result.add(dependencyDescription);
