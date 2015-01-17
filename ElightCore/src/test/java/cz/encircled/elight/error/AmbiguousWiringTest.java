@@ -12,7 +12,7 @@ public class AmbiguousWiringTest extends AbstractErrorTest {
 
     @Test(expected = AmbiguousDependencyException.class)
     public void ambiguousWiringTest() {
-        ApplicationContext innerContext = new AnnotationApplicationContext("cz.encircled.elight.errormodel.contexterror").initialize();
+        ApplicationContext innerContext = new AnnotationApplicationContext("cz.encircled.elight.errormodel.contexterror.ambiguous").initialize();
     }
 
 }

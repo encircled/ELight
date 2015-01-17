@@ -1,12 +1,12 @@
 package cz.encircled.elight.core.definition;
 
 import cz.encircled.elight.core.ComponentPostProcessor;
-import cz.encircled.elight.core.definition.dependency.DependencyDescription;
-import cz.encircled.elight.core.definition.dependency.DependencyInjectionType;
 import cz.encircled.elight.core.annotation.*;
 import cz.encircled.elight.core.annotation.Scope;
 import cz.encircled.elight.core.context.ContextConstants;
 import cz.encircled.elight.core.creator.InstanceCreator;
+import cz.encircled.elight.core.definition.dependency.DependencyDescription;
+import cz.encircled.elight.core.definition.dependency.DependencyInjectionType;
 import cz.encircled.elight.core.exception.RawTypeException;
 import cz.encircled.elight.core.exception.RuntimeELightException;
 import cz.encircled.elight.core.util.ComponentUtil;
@@ -138,6 +138,7 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
 
             dependencyDescription.targetField = field;
             dependencyDescription.dependencyInjectionType = DependencyInjectionType.FIELD;
+
             result.add(dependencyDescription);
         }
     }

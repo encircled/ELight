@@ -33,6 +33,8 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     private List<ComponentPostProcessor> componentPostProcessors = new ArrayList<>();
 
+    private Set<String> componentsInCreation = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
     @Override
     public void instantiateSingletons() {
         definitions.values().stream().forEach(definition -> {
@@ -112,11 +114,13 @@ public class DefaultComponentFactory implements ComponentFactory {
         if (definition == null) {
             throw new ComponentNotFoundException(name);
         }
-        if (definition.isSingleton()) {
-            return singletonInstances.get(name);
-        } else {
-            return getInitializedPrototypeComponent(definition);
+        // TODO before/after; correct exception
+        if(!componentsInCreation.add(name)) {
+            throw new SelfReferenceOnPrototypeException();
         }
+        Object component = definition.isSingleton ? singletonInstances.get(name) : getInitializedPrototypeComponent(definition);
+        componentsInCreation.remove(name);
+        return component;
     }
 
     @Override

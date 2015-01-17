@@ -15,6 +15,9 @@ import java.util.Map;
 public class House extends AbstractHouse implements Building {
 
     @Wired
+    public House self;
+
+    @Wired
     private List<Window> windows;
 
     @Wired

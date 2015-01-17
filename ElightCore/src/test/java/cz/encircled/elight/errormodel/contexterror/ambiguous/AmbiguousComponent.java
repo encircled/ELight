@@ -1,4 +1,4 @@
-package cz.encircled.elight.errormodel.contexterror;
+package cz.encircled.elight.errormodel.contexterror.ambiguous;
 
 import cz.encircled.elight.core.annotation.Component;
 

@@ -19,6 +19,7 @@ public class DependencyDescription {
 
     public Type targetType;
 
+    // Class to be injected
     public Class<?> targetClass;
 
     public boolean isRequired = true;
