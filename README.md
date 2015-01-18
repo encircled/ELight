@@ -1,7 +1,7 @@
 ELight
 ======
 
-Lightweight IoC container for java.
+Lightweight and fast IoC container for Java.
 Full reference implementation of JSR-330 and custom features.
 
 Usage
