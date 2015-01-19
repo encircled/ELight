@@ -9,4 +9,8 @@ public class WiredMapGenericException extends RuntimeELightException {
         super("For wiring a map, it's key or value must be component from context");
     }
 
+    public WiredMapGenericException(String msg) {
+        super(msg);
+    }
+
 }

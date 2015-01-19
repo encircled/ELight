@@ -43,15 +43,23 @@ public class CollectionUtil {
         }
     }
 
-    public static <K, V> Map<K, V> collectionToMap(Collection<K> sourceCollection) {
-        return collectionToMap(sourceCollection, new HashMap<>());
+    public static <K, V> Map<K, V> collectionToMapAsKey(Collection<K> keyCollection) {
+        return collectionToMap(keyCollection, null, new HashMap<>());
     }
 
-    public static <K, V> Map<K, V> collectionToMap(Collection<K> sourceCollection, Map<K, V> targetMap) {
-        if (isEmpty(sourceCollection)) {
+    public static <K, V> Map<K, V> collectionToMap(Collection<K> keyCollection, Collection<V> valueCollection, Map<K, V> targetMap) {
+        if (isEmpty(keyCollection)) {
             return targetMap;
         }
-        sourceCollection.stream().forEach(e -> targetMap.put(e, null));
+        if(valueCollection == null)
+            valueCollection = new ArrayList<>();
+
+        Iterator<K> keyIterator = keyCollection.iterator();
+        Iterator<V> valueIterator = valueCollection.iterator();
+        while (keyIterator.hasNext()) {
+            V value = valueIterator.hasNext() ? valueIterator.next() : null;
+            targetMap.put(keyIterator.next(), value);
+        }
         return targetMap;
     }
 

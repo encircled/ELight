@@ -1,16 +1,10 @@
 package cz.encircled.elight.context;
 
 import cz.encircled.elight.core.context.ApplicationContext;
-import cz.encircled.elight.core.exception.ComponentNotFoundException;
-import cz.encircled.elight.model.condition.FalseConditionComponent;
-import cz.encircled.elight.model.condition.TrueConditionComponent;
 import cz.encircled.elight.model.house.Building;
 import cz.encircled.elight.model.house.House;
-import cz.encircled.elight.model.house.Window;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Map;
 
 /**
  * Created by Encircled on 22-Dec-14.
@@ -31,32 +25,6 @@ public class ApplicationContextCreationTest extends AbstractContextTest {
 
         Assert.assertNotNull(house.getDoor());
         Assert.assertTrue(house.isInitCalled());
-    }
-
-    @Test
-    public void mapsTest() {
-        House house = applicationContext.getComponent(House.class);
-        Map<Window, String> windowAsKeyMap = house.getWindowAsKeyMap();
-        Assert.assertNotNull(windowAsKeyMap);
-        Assert.assertTrue(windowAsKeyMap.size() > 0);
-
-        Map<String, Window> windowAsValueMap = house.getWindowAsValueMap();
-        Assert.assertNotNull(windowAsValueMap);
-        Assert.assertTrue(windowAsValueMap.size() > 0);
-    }
-
-    @Test(expected = ComponentNotFoundException.class)
-    public void conditionalTest() {
-        TrueConditionComponent trueCondition = applicationContext.getComponent(TrueConditionComponent.class);
-        Assert.assertNotNull(trueCondition);
-        applicationContext.getComponent(FalseConditionComponent.class);
-    }
-
-    @Test(expected = ComponentNotFoundException.class)
-    public void conditionalByNameTest() {
-        TrueConditionComponent trueCondition = (TrueConditionComponent) applicationContext.getComponent("trueConditionComponent");
-        Assert.assertNotNull(trueCondition);
-        applicationContext.getComponent("falseConditionComponent");
     }
 
     @Test

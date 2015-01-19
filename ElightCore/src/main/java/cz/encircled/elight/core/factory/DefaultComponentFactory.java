@@ -58,8 +58,8 @@ public class DefaultComponentFactory implements ComponentFactory {
     @Override
     public void onDestroy() {
         log.debug("Call singletons PreDestroy methods");
-        for(ComponentDefinition definition : definitions.values()) {
-            if(definition.isSingleton && definition.destroyMethod != null) {
+        for (ComponentDefinition definition : definitions.values()) {
+            if (definition.isSingleton && definition.destroyMethod != null) {
                 ReflectionUtil.invokeMethod(getComponent(definition.name), definition.destroyMethod);
             }
         }
@@ -115,7 +115,7 @@ public class DefaultComponentFactory implements ComponentFactory {
             throw new ComponentNotFoundException(name);
         }
         // TODO before/after; correct exception
-        if(!componentsInCreation.add(name)) {
+        if (!componentsInCreation.add(name)) {
             throw new SelfReferenceOnPrototypeException();
         }
         Object component = definition.isSingleton ? singletonInstances.get(name) : getInitializedPrototypeComponent(definition);
@@ -143,7 +143,7 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     public ComponentDefinition getDefinition(String name) {
         ComponentDefinition definition = definitions.get(name);
-        if(definition == null)
+        if (definition == null)
             throw new ComponentNotFoundException(name);
         return definition;
     }
@@ -164,7 +164,7 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     @Override
     public <T> T getComponent(Class<T> type, boolean required) {
-        if(required) {
+        if (required) {
             return getComponent(type);
         } else {
             return containsComponent(type) ? getComponent(type) : null;
@@ -232,7 +232,7 @@ public class DefaultComponentFactory implements ComponentFactory {
 
         Object objToInject = dependency.isProvider ? new DependencyProvider(dependency) : getObjectToInject(dependency);
 
-        if(dependency.dependencyInjectionType == DependencyInjectionType.FIELD) {
+        if (dependency.dependencyInjectionType == DependencyInjectionType.FIELD) {
             ReflectionUtil.setField(componentInstance, dependency.targetField, objToInject);
         } else {
             ReflectionUtil.invokeMethod(componentInstance, dependency.targetMethod, objToInject);
@@ -245,7 +245,7 @@ public class DefaultComponentFactory implements ComponentFactory {
         Class<?> targetClass = dependency.targetClass;
         if (Collection.class.isAssignableFrom(targetClass)) {
             Class[] genericClasses = ReflectionUtil.getGenericClasses(dependency.targetType);
-            if(genericClasses.length == 0) {
+            if (genericClasses.length == 0) {
                 throw new RawTypeException("Generic type must be specified: " + dependency.targetType);
             }
             Collection<Object> appropriateCollection = CollectionUtil.getAppropriateCollection((Class<? extends Collection<Object>>) targetClass);
@@ -257,21 +257,30 @@ public class DefaultComponentFactory implements ComponentFactory {
             objToInject = CollectionUtil.collectionToArray(componentsToInject, componentType);
         } else if (Map.class.isAssignableFrom(targetClass)) {
             Class[] genericClasses = ReflectionUtil.getGenericClasses(dependency.targetType);
-            if(genericClasses.length == 0) {
+            if (genericClasses.length == 0) {
                 throw new RawTypeException("Generic type must be specified: " + dependency.targetType);
             }
             Class<Object> keyGenericClass = genericClasses[0];
             Class<Object> valueGenericClass = genericClasses[1];
 
-            List<Object> componentsForKey = getComponents(keyGenericClass);
+            List<?> componentsForKey = getComponents(keyGenericClass);
             List<Object> componentsForValue = getComponents(valueGenericClass);
             Map<Object, Object> appropriateMap = CollectionUtil.getAppropriateMap((Class<? extends Map<Object, Object>>) targetClass);
             if (componentsForKey.isEmpty() && !componentsForValue.isEmpty()) {
-                objToInject = CollectionUtil.collectionToMap(getComponents(valueGenericClass), appropriateMap);
+                // Map's value is managed by context
+                if (keyGenericClass.equals(String.class) || keyGenericClass.equals(Object.class)) {
+                    // TODO correct name
+                    List<Object> names = componentsForValue.stream().unordered().map(c -> c.getClass().getSimpleName()).collect(Collectors.toList());
+                    objToInject = CollectionUtil.collectionToMap(names, componentsForValue, appropriateMap);
+                } else {
+                    throw new WiredMapGenericException("For wiring components to map as value, it's key must be a String or Object");
+                }
             } else if (!componentsForKey.isEmpty() && componentsForValue.isEmpty()) {
-                objToInject = CollectionUtil.collectionToMap(getComponents(keyGenericClass), appropriateMap);
+                // Map's key is managed by context
+                // TODO value
+                objToInject = CollectionUtil.collectionToMap(getComponents(keyGenericClass), null, appropriateMap);
             } else {
-                if(dependency.isRequired)
+                if (dependency.isRequired)
                     throw new WiredMapGenericException();
                 else
                     objToInject = appropriateMap;
