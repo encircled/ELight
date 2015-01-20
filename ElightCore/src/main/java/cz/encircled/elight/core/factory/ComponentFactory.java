@@ -18,6 +18,8 @@ public interface ComponentFactory {
 
     Object getComponent(String name, boolean required);
 
+    List<Object> getComponents(List<String> names);
+
     <T> T getComponent(Class<T> type);
 
     <T> T getComponent(Class<T> type, boolean required);

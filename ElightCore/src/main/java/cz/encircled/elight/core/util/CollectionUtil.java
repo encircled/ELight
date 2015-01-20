@@ -63,6 +63,22 @@ public class CollectionUtil {
         return targetMap;
     }
 
+    public static Map<Object, Object> collectionToMapUnsafe(Collection<?> keyCollection, Collection<?> valueCollection, Map<Object, Object> targetMap) {
+        if (isEmpty(keyCollection)) {
+            return targetMap;
+        }
+        if(valueCollection == null)
+            valueCollection = new ArrayList<>();
+
+        Iterator<?> keyIterator = keyCollection.iterator();
+        Iterator<?> valueIterator = valueCollection.iterator();
+        while (keyIterator.hasNext()) {
+            Object value = valueIterator.hasNext() ? valueIterator.next() : null;
+            targetMap.put(keyIterator.next(), value);
+        }
+        return targetMap;
+    }
+
     public static String stringify(Object[] array) {
         if (isEmpty(array)) {
             return "";

@@ -132,6 +132,13 @@ public class DefaultComponentFactory implements ComponentFactory {
         }
     }
 
+    @Override
+    public List<Object> getComponents(List<String> names) {
+        if(names == null)
+            throw new NullPointerException();
+        return names.stream().map(this::getComponent).collect(Collectors.toList());
+    }
+
     private Object getInitializedPrototypeComponent(ComponentDefinition definition) {
         Object instance = instantiateComponent(definition);
         definition.dependencies.forEach(dependency -> {
@@ -185,6 +192,21 @@ public class DefaultComponentFactory implements ComponentFactory {
                 components.add((T) getComponent(definition.name));
             }
         }
+        return components;
+    }
+
+    public List<String> getComponentNamesOfType(Class<?> type) {
+        List<String> components = new ArrayList<>();
+        resolvedDependencies.forEach((name, component) -> {
+            if(type.isAssignableFrom(component.getClass())) {
+                components.add(name);
+            }
+        });
+        definitions.forEach((name, def) -> {
+            if(type.isAssignableFrom(def.clazz)) {
+                components.add(name);
+            }
+        });
         return components;
     }
 
@@ -263,27 +285,29 @@ public class DefaultComponentFactory implements ComponentFactory {
             Class<Object> keyGenericClass = genericClasses[0];
             Class<Object> valueGenericClass = genericClasses[1];
 
-            List<?> componentsForKey = getComponents(keyGenericClass);
-            List<Object> componentsForValue = getComponents(valueGenericClass);
+            List<String> componentsForKey = getComponentNamesOfType(keyGenericClass);
+            List<String> componentsForValue = getComponentNamesOfType(valueGenericClass);
+
             Map<Object, Object> appropriateMap = CollectionUtil.getAppropriateMap((Class<? extends Map<Object, Object>>) targetClass);
             if (componentsForKey.isEmpty() && !componentsForValue.isEmpty()) {
                 // Map's value is managed by context
                 if (keyGenericClass.equals(String.class) || keyGenericClass.equals(Object.class)) {
-                    // TODO correct name
-                    List<Object> names = componentsForValue.stream().unordered().map(c -> c.getClass().getSimpleName()).collect(Collectors.toList());
-                    objToInject = CollectionUtil.collectionToMap(names, componentsForValue, appropriateMap);
+                    List<Object> components = getComponents(componentsForValue);
+                    objToInject = CollectionUtil.collectionToMapUnsafe(componentsForValue, components, appropriateMap);
                 } else {
                     throw new WiredMapGenericException("For wiring components to map as value, it's key must be a String or Object");
                 }
             } else if (!componentsForKey.isEmpty() && componentsForValue.isEmpty()) {
                 // Map's key is managed by context
-                // TODO value
-                objToInject = CollectionUtil.collectionToMap(getComponents(keyGenericClass), null, appropriateMap);
+                List<Object> components = getComponents(componentsForKey);
+                objToInject = CollectionUtil.collectionToMapUnsafe(components, componentsForKey, appropriateMap);
             } else {
                 if (dependency.isRequired)
                     throw new WiredMapGenericException();
-                else
+                else {
+                    // TODO + resolved dependencies test
                     objToInject = appropriateMap;
+                }
             }
         } else {
             if (dependency.hasNameQualifier()) {
