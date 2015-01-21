@@ -116,7 +116,7 @@ public class DefaultComponentFactory implements ComponentFactory {
         }
         // TODO before/after; correct exception
         if (!componentsInCreation.add(name)) {
-            throw new SelfReferenceOnPrototypeException();
+            throw new ComponentIsAlreadyInCreationException(name);
         }
         Object component = definition.isSingleton ? singletonInstances.get(name) : getInitializedPrototypeComponent(definition);
         componentsInCreation.remove(name);
@@ -305,7 +305,6 @@ public class DefaultComponentFactory implements ComponentFactory {
                 if (dependency.isRequired)
                     throw new WiredMapGenericException();
                 else {
-                    // TODO + resolved dependencies test
                     objToInject = appropriateMap;
                 }
             }
