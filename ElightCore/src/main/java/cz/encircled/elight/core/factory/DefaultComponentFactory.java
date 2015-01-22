@@ -25,6 +25,7 @@ public class DefaultComponentFactory implements ComponentFactory {
 
     private Map<String, ComponentDefinition> definitions = new ConcurrentHashMap<>(32);
 
+    // TODO cache
     private Map<Class<?>, String[]> typeToName = new ConcurrentHashMap<>(32);
 
     private Map<String, Object> singletonInstances = new HashMap<>(32);
@@ -65,29 +66,6 @@ public class DefaultComponentFactory implements ComponentFactory {
         }
     }
 
-    private void afterComponentInstantiation(Object instance, ComponentDefinition definition) {
-        if (definition.initMethod != null) {
-            ReflectionUtil.invokeMethod(instance, definition.initMethod);
-        }
-        for (ComponentPostProcessor processor : componentPostProcessors) {
-            instance = processor.postProcess(instance);
-        }
-    }
-
-    private Object instantiateComponent(ComponentDefinition definition) {
-        Object instance;
-        if (definition.hasInstanceCreator()) {
-            log.debug("Instantiate {} with creator: {}", definition, definition.instanceCreator);
-            instance = ReflectionUtil.instance(definition.instanceCreator).createInstance(definition.clazz);
-        } else {
-            instance = ReflectionUtil.instance(definition.clazz);
-        }
-        for (ComponentPostProcessor processor : componentPostProcessors) {
-            instance = processor.preProcess(instance);
-        }
-        return instance;
-    }
-
     @Override
     public void registerDefinition(ComponentDefinition componentDefinition) {
         String name = componentDefinition.name;
@@ -114,7 +92,6 @@ public class DefaultComponentFactory implements ComponentFactory {
         if (definition == null) {
             throw new ComponentNotFoundException(name);
         }
-        // TODO before/after; correct exception
         if (!componentsInCreation.add(name)) {
             throw new ComponentIsAlreadyInCreationException(name);
         }
@@ -133,32 +110,9 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     @Override
-    public List<Object> getComponents(List<String> names) {
-        if(names == null)
-            throw new NullPointerException();
-        return names.stream().map(this::getComponent).collect(Collectors.toList());
-    }
-
-    private Object getInitializedPrototypeComponent(ComponentDefinition definition) {
-        Object instance = instantiateComponent(definition);
-        definition.dependencies.forEach(dependency -> {
-            resolveDependency(definition.name, instance, dependency);
-        });
-        afterComponentInstantiation(instance, definition);
-        return instance;
-    }
-
-    public ComponentDefinition getDefinition(String name) {
-        ComponentDefinition definition = definitions.get(name);
-        if (definition == null)
-            throw new ComponentNotFoundException(name);
-        return definition;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public <T> T getComponent(Class<T> type) {
-        List<T> components = getComponents(type);
+    public <T> T getComponentOfType(Class<T> type) {
+        List<T> components = getComponentsOfType(type);
         switch (components.size()) {
             case 0:
                 throw new ComponentNotFoundException(type);
@@ -170,17 +124,17 @@ public class DefaultComponentFactory implements ComponentFactory {
     }
 
     @Override
-    public <T> T getComponent(Class<T> type, boolean required) {
+    public <T> T getComponentOfType(Class<T> type, boolean required) {
         if (required) {
-            return getComponent(type);
+            return getComponentOfType(type);
         } else {
-            return containsComponent(type) ? getComponent(type) : null;
+            return containsComponent(type) ? getComponentOfType(type) : null;
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> List<T> getComponents(Class<T> type) {
+    public <T> List<T> getComponentsOfType(Class<T> type) {
         List<T> components = new ArrayList<>();
         for (Object candidate : resolvedDependencies.values()) {
             if (type.isAssignableFrom(candidate.getClass())) {
@@ -192,21 +146,6 @@ public class DefaultComponentFactory implements ComponentFactory {
                 components.add((T) getComponent(definition.name));
             }
         }
-        return components;
-    }
-
-    public List<String> getComponentNamesOfType(Class<?> type) {
-        List<String> components = new ArrayList<>();
-        resolvedDependencies.forEach((name, component) -> {
-            if(type.isAssignableFrom(component.getClass())) {
-                components.add(name);
-            }
-        });
-        definitions.forEach((name, def) -> {
-            if(type.isAssignableFrom(def.clazz)) {
-                components.add(name);
-            }
-        });
         return components;
     }
 
@@ -245,7 +184,7 @@ public class DefaultComponentFactory implements ComponentFactory {
     /**
      * Resolved dependencies are not included
      */
-    public List<ComponentDefinition> getDefinitionsOfType(Class<?> type) {
+    private List<ComponentDefinition> getDefinitionsOfType(Class<?> type) {
         return definitions.values().stream().filter(definition -> type.isAssignableFrom(definition.clazz)).collect(Collectors.toList());
     }
 
@@ -314,7 +253,7 @@ public class DefaultComponentFactory implements ComponentFactory {
             } else if (dependency.qualifiers != null) {
                 objToInject = getComponentByQualifiers(targetClass, dependency.qualifiers, dependency.isRequired);
             } else {
-                objToInject = getComponent(targetClass, dependency.isRequired);
+                objToInject = getComponentOfType(targetClass, dependency.isRequired);
             }
         }
         return objToInject;
@@ -337,6 +276,61 @@ public class DefaultComponentFactory implements ComponentFactory {
         return foundComponents;
     }
 
+    private Object getInitializedPrototypeComponent(ComponentDefinition definition) {
+        Object instance = instantiateComponent(definition);
+        definition.dependencies.forEach(dependency -> {
+            resolveDependency(definition.name, instance, dependency);
+        });
+        afterComponentInstantiation(instance, definition);
+        return instance;
+    }
+
+    private ComponentDefinition getDefinition(String name) {
+        ComponentDefinition definition = definitions.get(name);
+        if (definition == null)
+            throw new ComponentNotFoundException(name);
+        return definition;
+    }
+
+
+    private List<String> getComponentNamesOfType(Class<?> type) {
+        List<String> components = new ArrayList<>();
+        resolvedDependencies.forEach((name, component) -> {
+            if(type.isAssignableFrom(component.getClass())) {
+                components.add(name);
+            }
+        });
+        definitions.forEach((name, def) -> {
+            if(type.isAssignableFrom(def.clazz)) {
+                components.add(name);
+            }
+        });
+        return components;
+    }
+
+    private void afterComponentInstantiation(Object instance, ComponentDefinition definition) {
+        if (definition.initMethod != null) {
+            ReflectionUtil.invokeMethod(instance, definition.initMethod);
+        }
+        for (ComponentPostProcessor processor : componentPostProcessors) {
+            instance = processor.postProcess(instance);
+        }
+    }
+
+    private Object instantiateComponent(ComponentDefinition definition) {
+        Object instance;
+        if (definition.hasInstanceCreator()) {
+            log.debug("Instantiate {} with creator: {}", definition, definition.instanceCreator);
+            instance = ReflectionUtil.instance(definition.instanceCreator).createInstance(definition.clazz);
+        } else {
+            instance = ReflectionUtil.instance(definition.clazz);
+        }
+        for (ComponentPostProcessor processor : componentPostProcessors) {
+            instance = processor.preProcess(instance);
+        }
+        return instance;
+    }
+
     private Object getComponentByQualifiers(Class<?> type, Object[] qualifiers, boolean isRequired) {
         List<ComponentDefinition> found = definitions.values().stream().unordered().filter(definition -> {
             return type.isAssignableFrom(definition.clazz) && Arrays.equals(qualifiers, definition.qualifiers);
@@ -350,6 +344,12 @@ public class DefaultComponentFactory implements ComponentFactory {
             throw new AmbiguousDependencyException(type, qualifiers);
         }
         return getComponent(found.get(0).name);
+    }
+
+    private List<Object> getComponents(List<String> names) {
+        if(names == null)
+            throw new NullPointerException();
+        return names.stream().map(this::getComponent).collect(Collectors.toList());
     }
 
     /**

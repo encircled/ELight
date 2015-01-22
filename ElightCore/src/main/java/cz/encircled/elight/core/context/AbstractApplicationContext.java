@@ -27,7 +27,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     @Override
     public <T> T getComponent(Class<T> clazz) {
-        return componentFactory.getComponent(clazz);
+        return componentFactory.getComponentOfType(clazz);
     }
 
     @Override

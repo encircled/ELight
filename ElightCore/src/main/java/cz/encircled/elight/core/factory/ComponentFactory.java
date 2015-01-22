@@ -18,13 +18,11 @@ public interface ComponentFactory {
 
     Object getComponent(String name, boolean required);
 
-    List<Object> getComponents(List<String> names);
+    <T> T getComponentOfType(Class<T> type);
 
-    <T> T getComponent(Class<T> type);
+    <T> T getComponentOfType(Class<T> type, boolean required);
 
-    <T> T getComponent(Class<T> type, boolean required);
-
-    <T> List<T> getComponents(Class<T> type);
+    <T> List<T> getComponentsOfType(Class<T> type);
 
     boolean containsComponent(Class<?> clazz);
 
