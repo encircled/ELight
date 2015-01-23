@@ -1,5 +1,6 @@
 package cz.encircled.elight.core.factory;
 
+import cz.encircled.elight.core.Caching;
 import cz.encircled.elight.core.definition.ComponentDefinition;
 import cz.encircled.elight.core.ComponentPostProcessor;
 
@@ -8,7 +9,7 @@ import java.util.List;
 /**
  * Created by Encircled on 22-Dec-14.
  */
-public interface ComponentFactory {
+public interface ComponentFactory extends Caching {
 
     void registerDefinition(ComponentDefinition componentDefinition);
 

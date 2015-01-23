@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 
 /**
  * Created by encircled on 9/19/14.
@@ -33,6 +35,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     @Override
     public Object getComponent(String name) {
         return componentFactory.getComponent(name);
+    }
+
+    @Override
+    public <T> List<T> getComponents(Class<T> clazz) {
+        return componentFactory.getComponentsOfType(clazz);
     }
 
     @Override

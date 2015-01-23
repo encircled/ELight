@@ -1,5 +1,7 @@
 package cz.encircled.elight.core.context;
 
+import java.util.List;
+
 /**
  * Created by encircled on 9/19/14.
  */
@@ -14,6 +16,15 @@ public interface ApplicationContext {
      * @throws cz.encircled.elight.core.exception.ComponentNotFoundException - if component was not found in context
      */
     <T> T getComponent(Class<T> clazz);
+
+    /**
+     * Looking for components in application context by given type
+     *
+     * @param clazz - type that component is assignable from
+     * @param <T>
+     * @return components from application context
+     */
+    <T> List<T> getComponents(Class<T> clazz);
 
     /**
      * Looking for component in application context by it's name

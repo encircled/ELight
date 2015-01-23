@@ -1,5 +1,6 @@
 package cz.encircled.elight.core.factory;
 
+import cz.encircled.elight.core.Caching;
 import cz.encircled.elight.core.definition.ComponentDefinition;
 import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.definition.dependency.DependencyDescription;
@@ -19,17 +20,21 @@ import java.util.stream.Collectors;
 /**
  * Created by Encircled on 22-Dec-14.
  */
-public class DefaultComponentFactory implements ComponentFactory {
+public class DefaultComponentFactory implements ComponentFactory, Caching {
 
     private static final Logger log = LogManager.getLogger();
 
     private Map<String, ComponentDefinition> definitions = new ConcurrentHashMap<>(32);
 
     // TODO cache
-    private Map<Class<?>, String[]> typeToName = new ConcurrentHashMap<>(32);
+    private Map<Class<?>, String[]> allNamesOfType = new ConcurrentHashMap<>(32);
+
+    // TODO usage
+    private boolean cacheAllowed = true;
 
     private Map<String, Object> singletonInstances = new HashMap<>(32);
 
+    // TODO warn on add after config end, clear cache
     private Map<String, Object> resolvedDependencies = new HashMap<>(32);
 
     private List<ComponentPostProcessor> componentPostProcessors = new ArrayList<>();
@@ -136,21 +141,36 @@ public class DefaultComponentFactory implements ComponentFactory {
     @SuppressWarnings("unchecked")
     public <T> List<T> getComponentsOfType(Class<T> type) {
         List<T> components = new ArrayList<>();
+
         for (Object candidate : resolvedDependencies.values()) {
             if (type.isAssignableFrom(candidate.getClass())) {
                 components.add((T) candidate);
             }
         }
-        for (ComponentDefinition definition : definitions.values()) {
-            if (type.isAssignableFrom(definition.clazz)) {
-                components.add((T) getComponent(definition.name));
+
+        String[] cached = allNamesOfType.get(type);
+        if(cached != null) {
+            for(String name : cached) {
+                components.add((T) getComponent(name));
             }
+        } else {
+            List<String> namesToCache = new ArrayList<>(4);
+            for (ComponentDefinition definition : definitions.values()) {
+                if (type.isAssignableFrom(definition.clazz)) {
+                    components.add((T) getComponent(definition.name));
+                    namesToCache.add(definition.name);
+                }
+            }
+            allNamesOfType.put(type, namesToCache.toArray(new String[namesToCache.size()]));
         }
         return components;
     }
 
     @Override
     public boolean containsComponent(Class<?> clazz) {
+        if(allNamesOfType.containsKey(clazz)) {
+            return true;
+        }
         for (Object candidate : resolvedDependencies.values()) {
             if (clazz.isAssignableFrom(candidate.getClass())) {
                 return true;
@@ -181,9 +201,27 @@ public class DefaultComponentFactory implements ComponentFactory {
         resolvedDependencies.put(name, component);
     }
 
+    /* Implementation of Caching */
+
+    @Override
+    public void clearCache() {
+        allNamesOfType.clear();
+    }
+
+    @Override
+    public boolean isCacheAllowed() {
+        return cacheAllowed;
+    }
+
+    @Override
+    public void setCacheAllowed(boolean cacheAllowed) {
+        this.cacheAllowed = cacheAllowed;
+    }
+
     /**
      * Resolved dependencies are not included
      */
+    // TODO may be replaced with DependencyComparator
     private List<ComponentDefinition> getDefinitionsOfType(Class<?> type) {
         return definitions.values().stream().filter(definition -> type.isAssignableFrom(definition.clazz)).collect(Collectors.toList());
     }
@@ -346,10 +384,16 @@ public class DefaultComponentFactory implements ComponentFactory {
         return getComponent(found.get(0).name);
     }
 
-    private List<Object> getComponents(List<String> names) {
+    private List<Object> getComponents(Collection<String> names) {
         if(names == null)
             throw new NullPointerException();
         return names.stream().map(this::getComponent).collect(Collectors.toList());
+    }
+
+    private List<Object> getComponents(String[] names) {
+        if(names == null)
+            throw new NullPointerException();
+        return Arrays.stream(names).map(this::getComponent).collect(Collectors.toList());
     }
 
     /**
