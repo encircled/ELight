@@ -12,6 +12,8 @@ import java.util.List;
 /**
  * Created by Encircled on 11/09/2014.
  */
+// TODO forbidden dependencies
+// TODO support for disabling JSR 330 for better performance (qualifiers only?)
 public class AnnotationApplicationContext extends AbstractApplicationContext implements ApplicationContext {
 
     private static final Logger log = LogManager.getLogger();

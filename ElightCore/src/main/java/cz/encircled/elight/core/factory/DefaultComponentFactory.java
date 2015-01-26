@@ -26,10 +26,8 @@ public class DefaultComponentFactory implements ComponentFactory, Caching {
 
     private Map<String, ComponentDefinition> definitions = new ConcurrentHashMap<>(32);
 
-    // TODO cache
     private Map<Class<?>, String[]> allNamesOfType = new ConcurrentHashMap<>(32);
 
-    // TODO usage
     private boolean cacheAllowed = true;
 
     private Map<String, Object> singletonInstances = new HashMap<>(32);
@@ -161,7 +159,8 @@ public class DefaultComponentFactory implements ComponentFactory, Caching {
                     namesToCache.add(definition.name);
                 }
             }
-            allNamesOfType.put(type, namesToCache.toArray(new String[namesToCache.size()]));
+            if(cacheAllowed)
+                allNamesOfType.put(type, namesToCache.toArray(new String[namesToCache.size()]));
         }
         return components;
     }
