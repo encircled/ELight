@@ -197,7 +197,7 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
                     qualifiers.add(value);
             }
         }
-        return qualifiers.toArray();
+        return qualifiers.isEmpty() ? null : qualifiers.toArray(new Object[qualifiers.size()]);
     }
 
 }
