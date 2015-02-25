@@ -11,19 +11,6 @@ import java.util.regex.Pattern;
  */
 public class IOUtil {
 
-    public static List<File> getFilesInFolder(String pathToFolder) {
-        return getFilesInFolder(new File(pathToFolder));
-    }
-
-    public static List<File> getFilesInFolder(File folder) {
-        if (folder == null || folder.isFile()) {
-            throw new IllegalArgumentException("Correct folder is expected");
-        }
-        ArrayList<File> result = new ArrayList<>(16);
-        getFilesInFolderInternal(folder, result, null);
-        return result;
-    }
-
     public static List<File> getFilesInFolder(String pathToFolder, String fileNamePattern) {
         return getFilesInFolder(new File(pathToFolder), fileNamePattern);
     }
@@ -50,10 +37,6 @@ public class IOUtil {
                 }
             }
         }
-    }
-
-    public static String getFileNameWithoutType(File file) {
-        return getFileNameWithoutType(file.getName());
     }
 
     public static String getFileNameWithoutType(String fileName) {

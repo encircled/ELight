@@ -1,6 +1,6 @@
 package cz.encircled.elight.core.annotation;
 
-import cz.encircled.elight.core.context.ContextConstants;
+import cz.encircled.elight.core.definition.DefinitionBuilder;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,6 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Order {
 
-    int value() default ContextConstants.DEFAULT_ORDER;
+    int value() default DefinitionBuilder.DEFAULT_COMPONENT_ORDER;
 
 }

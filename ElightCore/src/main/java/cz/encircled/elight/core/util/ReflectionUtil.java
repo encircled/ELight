@@ -138,6 +138,9 @@ public class ReflectionUtil {
     }
 
     public static Class[] getGenericClasses(Type type) {
+        if (type instanceof Class) {
+            return new Class[]{};
+        }
         ParameterizedType genericType = (ParameterizedType) type;
         Type[] types = genericType.getActualTypeArguments();
         Class[] classes = new Class[types.length];

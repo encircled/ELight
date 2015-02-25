@@ -5,6 +5,8 @@ package cz.encircled.elight.core.definition;
  */
 public interface DefinitionBuilder {
 
+    public static int DEFAULT_COMPONENT_ORDER = 0;
+
     /**
      * @param clazz - candidate class
      * @return <b>true</b> - if assigned <code>class</code> have to be managed by context

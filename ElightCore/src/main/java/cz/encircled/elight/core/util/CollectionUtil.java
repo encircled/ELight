@@ -43,26 +43,6 @@ public class CollectionUtil {
         }
     }
 
-    public static <K, V> Map<K, V> collectionToMapAsKey(Collection<K> keyCollection) {
-        return collectionToMap(keyCollection, null, new HashMap<>());
-    }
-
-    public static <K, V> Map<K, V> collectionToMap(Collection<K> keyCollection, Collection<V> valueCollection, Map<K, V> targetMap) {
-        if (isEmpty(keyCollection)) {
-            return targetMap;
-        }
-        if(valueCollection == null)
-            valueCollection = new ArrayList<>();
-
-        Iterator<K> keyIterator = keyCollection.iterator();
-        Iterator<V> valueIterator = valueCollection.iterator();
-        while (keyIterator.hasNext()) {
-            V value = valueIterator.hasNext() ? valueIterator.next() : null;
-            targetMap.put(keyIterator.next(), value);
-        }
-        return targetMap;
-    }
-
     public static Map<Object, Object> collectionToMapUnsafe(Collection<?> keyCollection, Collection<?> valueCollection, Map<Object, Object> targetMap) {
         if (isEmpty(keyCollection)) {
             return targetMap;

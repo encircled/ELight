@@ -3,10 +3,10 @@ package cz.encircled.elight.core.definition;
 import cz.encircled.elight.core.ComponentPostProcessor;
 import cz.encircled.elight.core.annotation.*;
 import cz.encircled.elight.core.annotation.Scope;
-import cz.encircled.elight.core.context.ContextConstants;
 import cz.encircled.elight.core.creator.InstanceCreator;
 import cz.encircled.elight.core.definition.dependency.DependencyDescription;
 import cz.encircled.elight.core.definition.dependency.DependencyInjectionType;
+import cz.encircled.elight.core.exception.NoFieldFoundForGetterException;
 import cz.encircled.elight.core.exception.RawTypeException;
 import cz.encircled.elight.core.exception.RuntimeELightException;
 import cz.encircled.elight.core.util.ComponentUtil;
@@ -37,7 +37,7 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
     @Override
     protected int getOrder(Class<?> clazz) {
         Order annotation = clazz.getAnnotation(Order.class);
-        return annotation != null ? annotation.value() : ContextConstants.DEFAULT_ORDER;
+        return annotation != null ? annotation.value() : DefinitionBuilder.DEFAULT_COMPONENT_ORDER;
     }
 
     @Override
@@ -96,6 +96,9 @@ public class AnnotationDefinitionBuilder extends AbstractDefinitionBuilder {
         if(dependencyDescription != null) {
             if(method.getParameterCount() == 0) {
                 Field fieldFromGetter = ReflectionUtil.getFieldSafe(clazz, ComponentUtil.getFieldNameFromGetter(method));
+                if (fieldFromGetter == null) {
+                    throw new NoFieldFoundForGetterException(method);
+                }
                 buildFieldDependencyDefinition(clazz, result, fieldFromGetter, dependencyDescription);
                 return;
             }
